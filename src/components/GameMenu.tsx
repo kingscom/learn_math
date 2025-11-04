@@ -1,7 +1,7 @@
 import { GameMode } from '../types';
 
 interface GameMenuProps {
-  onStartGame: (mode: 'addition' | 'multiplication' | 'english' | 'proverb' | 'country') => void;
+  onStartGame: (mode: 'addition' | 'multiplication' | 'english' | 'proverb' | 'country' | 'historical') => void;
 }
 
 export default function GameMenu({ onStartGame }: GameMenuProps) {
@@ -50,11 +50,20 @@ export default function GameMenu({ onStartGame }: GameMenuProps) {
 
           <button
             onClick={() => onStartGame('country')}
-            className="w-full bg-purple-500 hover:bg-purple-600 text-white font-bold py-6 px-8 rounded-xl text-xl transition-colors shadow-lg md:col-span-2 lg:col-span-1"
+            className="w-full bg-purple-500 hover:bg-purple-600 text-white font-bold py-6 px-8 rounded-xl text-xl transition-colors shadow-lg"
           >
             <div className="text-3xl mb-2">🌍</div>
             <div>나라와 수도</div>
             <div className="text-sm opacity-80">세계 지리</div>
+          </button>
+
+          <button
+            onClick={() => onStartGame('historical')}
+            className="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-6 px-8 rounded-xl text-xl transition-colors shadow-lg md:col-span-2 lg:col-span-1"
+          >
+            <div className="text-3xl mb-2">👑</div>
+            <div>위인 퀴즈</div>
+            <div className="text-sm opacity-80">국내외 인물</div>
           </button>
         </div>
       </div>

@@ -67,6 +67,13 @@ export default function KoreanKeyboard({
       
       <div className="grid grid-cols-4 gap-3">
         <button
+          onClick={onHint}
+          disabled={showResult || !canHint}
+          className="bg-orange-500 hover:bg-orange-600 disabled:bg-gray-300 text-white font-bold py-5 px-3 rounded-lg transition-colors text-base lg:text-lg"
+        >
+          💡 힌트
+        </button>
+        <button
           onClick={onSpace}
           disabled={showResult}
           className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300 text-white font-bold py-5 px-3 rounded-lg transition-colors text-base lg:text-lg"
@@ -79,13 +86,6 @@ export default function KoreanKeyboard({
           className="bg-gray-500 hover:bg-gray-600 disabled:bg-gray-300 text-white font-bold py-5 px-3 rounded-lg transition-colors text-base lg:text-lg"
         >
           지우기
-        </button>
-        <button
-          onClick={onHint}
-          disabled={showResult || !canHint}
-          className="bg-orange-500 hover:bg-orange-600 disabled:bg-gray-300 text-white font-bold py-5 px-3 rounded-lg transition-colors text-base lg:text-lg"
-        >
-          💡 힌트
         </button>
         <button
           onClick={onSubmit}

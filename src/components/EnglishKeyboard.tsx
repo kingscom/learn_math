@@ -65,18 +65,18 @@ export default function EnglishKeyboard({
       
       <div className="grid grid-cols-3 gap-3">
         <button
-          onClick={onClear}
-          disabled={showResult}
-          className="bg-gray-500 hover:bg-gray-600 disabled:bg-gray-300 text-white font-bold py-5 px-3 rounded-lg transition-colors text-base lg:text-lg"
-        >
-          지우기
-        </button>
-        <button
           onClick={onHint}
           disabled={showResult || !canHint}
           className="bg-orange-500 hover:bg-orange-600 disabled:bg-gray-300 text-white font-bold py-5 px-3 rounded-lg transition-colors text-base lg:text-lg"
         >
           💡 힌트
+        </button>
+        <button
+          onClick={onClear}
+          disabled={showResult}
+          className="bg-gray-500 hover:bg-gray-600 disabled:bg-gray-300 text-white font-bold py-5 px-3 rounded-lg transition-colors text-base lg:text-lg"
+        >
+          지우기
         </button>
         <button
           onClick={onSubmit}

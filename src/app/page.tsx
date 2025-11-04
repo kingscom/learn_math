@@ -17,6 +17,7 @@ export default function Home() {
     wordProblems,
     proverbProblems,
     countryProblems,
+    historicalProblems,
     isFirstHalf,
     currentProblem,
     userAnswer,
@@ -130,9 +131,9 @@ export default function Home() {
         </div>
 
         {/* 메인 콘텐츠 - 가로 레이아웃 (태블릿 가로 모드 최적화) */}
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-2 lg:gap-4 min-h-[calc(100vh-120px)]">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-2 lg:gap-4 min-h-[calc(100vh-170px)]">
           {/* 왼쪽: 문제 영역 (2/5 비율) */}
-          <div className="lg:col-span-2 bg-white rounded-xl lg:rounded-2xl shadow-xl p-4 lg:p-6 flex flex-col justify-center min-h-[350px] lg:min-h-[500px]">
+          <div className="lg:col-span-2 bg-white rounded-xl lg:rounded-2xl shadow-xl p-4 lg:p-6 flex flex-col justify-center min-h-[350px] lg:min-h-[450px]">
             {gameMode === 'english' ? (
               <div className="text-center">
                 <div className="text-4xl lg:text-6xl font-bold text-gray-800 mb-6 lg:mb-8">
@@ -198,6 +199,20 @@ export default function Home() {
                   </div>
                 )}
               </div>
+            ) : gameMode === 'historical' ? (
+              <div className="text-center">
+                <div className="text-3xl lg:text-5xl font-bold text-gray-800 mb-6 lg:mb-8">
+                  👑 위인 퀴즈
+                </div>
+                <div className="text-lg lg:text-2xl text-gray-700 mb-6 lg:mb-8 leading-relaxed px-4">
+                  {historicalProblems[currentProblem]?.description}
+                </div>
+                {hintLevel > 0 && (
+                  <div className="text-xl lg:text-3xl text-blue-600 mb-4 lg:mb-6">
+                    💡 힌트: {historicalProblems[currentProblem]?.answer.substring(0, hintLevel)}...
+                  </div>
+                )}
+              </div>
             ) : (
               <div className="text-center">
                 <div className="text-4xl lg:text-6xl font-bold text-gray-800 mb-4 lg:mb-6">
@@ -227,6 +242,7 @@ export default function Home() {
                         gameMode === 'english' ? wordProblems[currentProblem]?.english :
                         gameMode === 'proverb' ? (proverbProblems[currentProblem]?.isFirstHalf ? proverbProblems[currentProblem]?.second : proverbProblems[currentProblem]?.first) :
                         gameMode === 'country' ? (countryProblems[currentProblem]?.askCountry ? countryProblems[currentProblem]?.country : countryProblems[currentProblem]?.capital) :
+                        gameMode === 'historical' ? historicalProblems[currentProblem]?.answer :
                         problems[currentProblem]?.answer
                       }이에요
                     </span>
@@ -237,7 +253,7 @@ export default function Home() {
           </div>
 
           {/* 오른쪽: 키보드 영역 (3/5 비율) */}
-          <div className="lg:col-span-3 bg-white rounded-2xl shadow-xl p-3 lg:p-6 flex items-center justify-center min-h-[400px] lg:min-h-[450px]">
+          <div className="lg:col-span-3 bg-white rounded-2xl shadow-xl p-3 lg:p-6 flex items-center justify-center min-h-[400px] lg:min-h-[400px]">
             {gameMode === 'english' ? (
               <EnglishKeyboard
                 onLetterClick={handleLetterClick}
@@ -269,6 +285,17 @@ export default function Home() {
                 showResult={showResult}
                 userAnswer={userAnswer}
                 canHint={hintLevel < (countryProblems[currentProblem]?.askCountry ? countryProblems[currentProblem]?.country : countryProblems[currentProblem]?.capital)?.length}
+              />
+            ) : gameMode === 'historical' ? (
+              <KoreanKeyboard
+                onKeyClick={handleKoreanClick}
+                onSpace={handleSpace}
+                onClear={handleClear}
+                onHint={handleHint}
+                onSubmit={handleSubmit}
+                showResult={showResult}
+                userAnswer={userAnswer}
+                canHint={hintLevel < historicalProblems[currentProblem]?.answer.length}
               />
             ) : (
               <NumberKeypad

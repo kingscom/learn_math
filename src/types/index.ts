@@ -21,4 +21,9 @@ export interface CountryProblem {
   askCountry?: boolean; // true면 수도를 보여주고 나라를 맞추기, false면 나라를 보여주고 수도를 맞추기
 }
 
-export type GameMode = 'menu' | 'addition' | 'multiplication' | 'english' | 'proverb' | 'country';
+export interface HistoricalFigureProblem {
+  description: string;
+  answer: string;
+}
+
+export type GameMode = 'menu' | 'addition' | 'multiplication' | 'english' | 'proverb' | 'country' | 'historical';

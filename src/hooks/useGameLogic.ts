@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { GameMode, Problem, WordProblem, ProverbProblem, CountryProblem } from '../types';
+import { GameMode, Problem, WordProblem, ProverbProblem, CountryProblem, HistoricalFigureProblem } from '../types';
 import { englishWords } from '../data/englishWords';
 import { koreanProverbs } from '../data/koreanProverbs';
 import { countries } from '../data/countries';
+import { historicalFigures } from '../data/historicalFigures';
 import { generateMathProblems, getRandomItems } from '../utils/gameUtils';
 
 export const useGameLogic = () => {
@@ -11,6 +12,7 @@ export const useGameLogic = () => {
   const [wordProblems, setWordProblems] = useState<WordProblem[]>([]);
   const [proverbProblems, setProverbProblems] = useState<ProverbProblem[]>([]);
   const [countryProblems, setCountryProblems] = useState<CountryProblem[]>([]);
+  const [historicalProblems, setHistoricalProblems] = useState<HistoricalFigureProblem[]>([]);
   const [isFirstHalf, setIsFirstHalf] = useState(true);
   const [currentProblem, setCurrentProblem] = useState(0);
   const [userAnswer, setUserAnswer] = useState('');
@@ -23,7 +25,7 @@ export const useGameLogic = () => {
   const [hintLevel, setHintLevel] = useState(0);
 
   // 게임 시작 함수
-  const startGame = (mode: 'addition' | 'multiplication' | 'english' | 'proverb' | 'country') => {
+  const startGame = (mode: 'addition' | 'multiplication' | 'english' | 'proverb' | 'country' | 'historical') => {
     if (timerId) {
       clearInterval(timerId);
       setTimerId(null);
@@ -82,6 +84,9 @@ export const useGameLogic = () => {
         askCountry: Math.random() > 0.5 // true면 수도를 주고 나라를 맞추기
       }));
       setCountryProblems(countriesWithRandomQuestion);
+    } else if (gameMode === 'historical') {
+      const shuffledHistorical = getRandomItems(historicalFigures, 10);
+      setHistoricalProblems(shuffledHistorical);
     } else {
       const newProblems = generateMathProblems(gameMode);
       setProblems(newProblems);
@@ -145,6 +150,9 @@ export const useGameLogic = () => {
       const currentCountryProblem = countryProblems[currentProblem];
       const correctAnswer = currentCountryProblem.askCountry ? currentCountryProblem.country : currentCountryProblem.capital;
       correct = userAnswer.trim() === correctAnswer;
+    } else if (gameMode === 'historical') {
+      const correctAnswer = historicalProblems[currentProblem].answer;
+      correct = userAnswer.trim() === correctAnswer;
     } else {
       const userNum = parseInt(userAnswer);
       correct = userNum === problems[currentProblem].answer;
@@ -160,6 +168,7 @@ export const useGameLogic = () => {
     const problemsLength = gameMode === 'english' ? wordProblems.length : 
                            gameMode === 'proverb' ? proverbProblems.length : 
                            gameMode === 'country' ? countryProblems.length : 
+                           gameMode === 'historical' ? historicalProblems.length :
                            problems.length;
     
     setTimeout(() => {
@@ -190,6 +199,10 @@ export const useGameLogic = () => {
       const correctAnswer = currentCountryProblem.askCountry ? currentCountryProblem.country : currentCountryProblem.capital;
       const nextHintLevel = Math.min(hintLevel + 1, correctAnswer.length);
       setHintLevel(nextHintLevel);
+    } else if (gameMode === 'historical' && historicalProblems.length > 0) {
+      const correctAnswer = historicalProblems[currentProblem].answer;
+      const nextHintLevel = Math.min(hintLevel + 1, correctAnswer.length);
+      setHintLevel(nextHintLevel);
     }
   };
 
@@ -200,6 +213,7 @@ export const useGameLogic = () => {
     wordProblems,
     proverbProblems,
     countryProblems,
+    historicalProblems,
     isFirstHalf,
     currentProblem,
     userAnswer,
@@ -218,9 +232,10 @@ export const useGameLogic = () => {
     handleHint,
     
     // Utils
-    isLoading: (gameMode !== 'english' && gameMode !== 'proverb' && gameMode !== 'country' && problems.length === 0) || 
+    isLoading: (gameMode !== 'english' && gameMode !== 'proverb' && gameMode !== 'country' && gameMode !== 'historical' && problems.length === 0) || 
                (gameMode === 'english' && wordProblems.length === 0) ||
                (gameMode === 'proverb' && proverbProblems.length === 0) ||
-               (gameMode === 'country' && countryProblems.length === 0)
+               (gameMode === 'country' && countryProblems.length === 0) ||
+               (gameMode === 'historical' && historicalProblems.length === 0)
   };
 };
