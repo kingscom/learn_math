@@ -338,6 +338,7 @@ export default function Home() {
   const [isCorrect, setIsCorrect] = useState(false);
   const [timeLeft, setTimeLeft] = useState(10);
   const [timerId, setTimerId] = useState<NodeJS.Timeout | null>(null);
+  const [hintLevel, setHintLevel] = useState(0);
 
   // 선택된 게임 모드에 따라 문제 생성
   useEffect(() => {
@@ -395,6 +396,7 @@ export default function Home() {
                   setCurrentProblem(prev => prev + 1);
                   setUserAnswer('');
                   setShowResult(false);
+                  setHintLevel(0);
                 } else {
                   setGameComplete(true);
                 }
@@ -443,6 +445,14 @@ export default function Home() {
     setUserAnswer('');
   };
 
+  const handleHint = () => {
+    if (gameMode === 'english' && wordProblems.length > 0) {
+      const correctAnswer = wordProblems[currentProblem].english;
+      const nextHintLevel = Math.min(hintLevel + 1, correctAnswer.length);
+      setHintLevel(nextHintLevel);
+    }
+  };
+
   const handleSubmit = () => {
     if (userAnswer === '') return;
 
@@ -476,6 +486,7 @@ export default function Home() {
         setCurrentProblem(prev => prev + 1);
         setUserAnswer('');
         setShowResult(false);
+        setHintLevel(0); // 다음 문제로 이동 시 힌트 초기화
       } else {
         setGameComplete(true);
       }
@@ -493,6 +504,7 @@ export default function Home() {
     setGameComplete(false);
     setShowResult(false);
     setTimeLeft(10);
+    setHintLevel(0);
     setGameMode('menu');
   };
 
@@ -508,6 +520,7 @@ export default function Home() {
     setGameComplete(false);
     setShowResult(false);
     setTimeLeft(10);
+    setHintLevel(0);
   };
 
   // 메뉴 화면
@@ -516,7 +529,7 @@ export default function Home() {
       <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-green-100 to-blue-100">
         <div className="text-center p-8 bg-white rounded-3xl shadow-2xl max-w-md mx-4">
           <div className="text-6xl mb-6">🎓</div>
-          <h1 className="text-3xl font-bold text-gray-800 mb-6">수학 게임을 선택하세요!</h1>
+          <h1 className="text-3xl font-bold text-gray-800 mb-6">게임을 선택하세요!</h1>
           
           <div className="space-y-4">
             <button
@@ -612,8 +625,15 @@ export default function Home() {
 
         <div className="mb-8">
           {gameMode === 'english' ? (
-            <div className="text-4xl font-bold text-gray-800 mb-4">
-              {wordProblems[currentProblem].korean}
+            <div>
+              <div className="text-4xl font-bold text-gray-800 mb-4">
+                {wordProblems[currentProblem].korean}
+              </div>
+              {hintLevel > 0 && (
+                <div className="text-2xl text-blue-600 mb-4">
+                  💡 힌트: {wordProblems[currentProblem].english.substring(0, hintLevel)}...
+                </div>
+              )}
             </div>
           ) : (
             <div className="text-4xl font-bold text-gray-800 mb-4">
@@ -643,32 +663,68 @@ export default function Home() {
         </div>
 
         {gameMode === 'english' ? (
-          // 알파벳 키보드
+          // QWERTY 키보드 배열
           <div className="mb-6">
-            <div className="grid grid-cols-6 gap-2 mb-4">
-              {['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'].map(letter => (
-                <button
-                  key={letter}
-                  onClick={() => handleLetterClick(letter)}
-                  disabled={showResult}
-                  className="bg-green-500 hover:bg-green-600 disabled:bg-gray-300 text-white font-bold py-3 px-2 rounded-lg text-lg transition-colors"
-                >
-                  {letter.toUpperCase()}
-                </button>
-              ))}
+            <div className="space-y-2 mb-4">
+              {/* 첫 번째 줄 */}
+              <div className="flex justify-center gap-1">
+                {['q','w','e','r','t','y','u','i','o','p'].map(letter => (
+                  <button
+                    key={letter}
+                    onClick={() => handleLetterClick(letter)}
+                    disabled={showResult}
+                    className="bg-green-500 hover:bg-green-600 disabled:bg-gray-300 text-white font-bold py-3 px-3 rounded-lg text-lg transition-colors min-w-[40px]"
+                  >
+                    {letter.toUpperCase()}
+                  </button>
+                ))}
+              </div>
+              {/* 두 번째 줄 */}
+              <div className="flex justify-center gap-1">
+                {['a','s','d','f','g','h','j','k','l'].map(letter => (
+                  <button
+                    key={letter}
+                    onClick={() => handleLetterClick(letter)}
+                    disabled={showResult}
+                    className="bg-green-500 hover:bg-green-600 disabled:bg-gray-300 text-white font-bold py-3 px-3 rounded-lg text-lg transition-colors min-w-[40px]"
+                  >
+                    {letter.toUpperCase()}
+                  </button>
+                ))}
+              </div>
+              {/* 세 번째 줄 */}
+              <div className="flex justify-center gap-1">
+                {['z','x','c','v','b','n','m'].map(letter => (
+                  <button
+                    key={letter}
+                    onClick={() => handleLetterClick(letter)}
+                    disabled={showResult}
+                    className="bg-green-500 hover:bg-green-600 disabled:bg-gray-300 text-white font-bold py-3 px-3 rounded-lg text-lg transition-colors min-w-[40px]"
+                  >
+                    {letter.toUpperCase()}
+                  </button>
+                ))}
+              </div>
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-3 gap-2">
               <button
                 onClick={handleClear}
                 disabled={showResult}
-                className="bg-gray-500 hover:bg-gray-600 disabled:bg-gray-300 text-white font-bold py-4 px-4 rounded-lg transition-colors"
+                className="bg-gray-500 hover:bg-gray-600 disabled:bg-gray-300 text-white font-bold py-4 px-2 rounded-lg transition-colors text-sm"
               >
                 지우기
               </button>
               <button
+                onClick={handleHint}
+                disabled={showResult || hintLevel >= wordProblems[currentProblem]?.english.length}
+                className="bg-orange-500 hover:bg-orange-600 disabled:bg-gray-300 text-white font-bold py-4 px-2 rounded-lg transition-colors text-sm"
+              >
+                💡 힌트
+              </button>
+              <button
                 onClick={handleSubmit}
                 disabled={showResult || userAnswer === ''}
-                className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300 text-white font-bold py-4 px-4 rounded-lg transition-colors"
+                className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300 text-white font-bold py-4 px-2 rounded-lg transition-colors text-sm"
               >
                 확인
               </button>
