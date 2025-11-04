@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { GameMode, Problem, WordProblem, ProverbProblem } from '../types';
+import { GameMode, Problem, WordProblem, ProverbProblem, CountryProblem } from '../types';
 import { englishWords } from '../data/englishWords';
 import { koreanProverbs } from '../data/koreanProverbs';
+import { countries } from '../data/countries';
 import { generateMathProblems, getRandomItems } from '../utils/gameUtils';
 
 export const useGameLogic = () => {
@@ -9,6 +10,7 @@ export const useGameLogic = () => {
   const [problems, setProblems] = useState<Problem[]>([]);
   const [wordProblems, setWordProblems] = useState<WordProblem[]>([]);
   const [proverbProblems, setProverbProblems] = useState<ProverbProblem[]>([]);
+  const [countryProblems, setCountryProblems] = useState<CountryProblem[]>([]);
   const [isFirstHalf, setIsFirstHalf] = useState(true);
   const [currentProblem, setCurrentProblem] = useState(0);
   const [userAnswer, setUserAnswer] = useState('');
@@ -21,7 +23,7 @@ export const useGameLogic = () => {
   const [hintLevel, setHintLevel] = useState(0);
 
   // 게임 시작 함수
-  const startGame = (mode: 'addition' | 'multiplication' | 'english' | 'proverb') => {
+  const startGame = (mode: 'addition' | 'multiplication' | 'english' | 'proverb' | 'country') => {
     if (timerId) {
       clearInterval(timerId);
       setTimerId(null);
@@ -72,6 +74,14 @@ export const useGameLogic = () => {
         isFirstHalf: Math.random() > 0.5
       }));
       setProverbProblems(proverbsWithRandomHalf);
+    } else if (gameMode === 'country') {
+      // 나라-수도를 랜덤하게 섞고 각각에 대해 나라/수도 중 어느 것을 물어볼지 랜덤 선택
+      const shuffledCountries = getRandomItems(countries, 10);
+      const countriesWithRandomQuestion = shuffledCountries.map(country => ({
+        ...country,
+        askCountry: Math.random() > 0.5 // true면 수도를 주고 나라를 맞추기
+      }));
+      setCountryProblems(countriesWithRandomQuestion);
     } else {
       const newProblems = generateMathProblems(gameMode);
       setProblems(newProblems);
@@ -131,6 +141,10 @@ export const useGameLogic = () => {
       const currentProverbProblem = proverbProblems[currentProblem];
       const correctAnswer = currentProverbProblem.isFirstHalf ? currentProverbProblem.second : currentProverbProblem.first;
       correct = userAnswer.trim() === correctAnswer;
+    } else if (gameMode === 'country') {
+      const currentCountryProblem = countryProblems[currentProblem];
+      const correctAnswer = currentCountryProblem.askCountry ? currentCountryProblem.country : currentCountryProblem.capital;
+      correct = userAnswer.trim() === correctAnswer;
     } else {
       const userNum = parseInt(userAnswer);
       correct = userNum === problems[currentProblem].answer;
@@ -143,7 +157,10 @@ export const useGameLogic = () => {
       setScore(prev => prev + 1);
     }
 
-    const problemsLength = gameMode === 'english' ? wordProblems.length : gameMode === 'proverb' ? proverbProblems.length : problems.length;
+    const problemsLength = gameMode === 'english' ? wordProblems.length : 
+                           gameMode === 'proverb' ? proverbProblems.length : 
+                           gameMode === 'country' ? countryProblems.length : 
+                           problems.length;
     
     setTimeout(() => {
       if (currentProblem < problemsLength - 1) {
@@ -168,6 +185,11 @@ export const useGameLogic = () => {
       const correctAnswer = currentProverbProblem.isFirstHalf ? currentProverbProblem.second : currentProverbProblem.first;
       const nextHintLevel = Math.min(hintLevel + 1, correctAnswer.length);
       setHintLevel(nextHintLevel);
+    } else if (gameMode === 'country' && countryProblems.length > 0) {
+      const currentCountryProblem = countryProblems[currentProblem];
+      const correctAnswer = currentCountryProblem.askCountry ? currentCountryProblem.country : currentCountryProblem.capital;
+      const nextHintLevel = Math.min(hintLevel + 1, correctAnswer.length);
+      setHintLevel(nextHintLevel);
     }
   };
 
@@ -177,6 +199,7 @@ export const useGameLogic = () => {
     problems,
     wordProblems,
     proverbProblems,
+    countryProblems,
     isFirstHalf,
     currentProblem,
     userAnswer,
@@ -195,8 +218,9 @@ export const useGameLogic = () => {
     handleHint,
     
     // Utils
-    isLoading: (gameMode !== 'english' && gameMode !== 'proverb' && problems.length === 0) || 
+    isLoading: (gameMode !== 'english' && gameMode !== 'proverb' && gameMode !== 'country' && problems.length === 0) || 
                (gameMode === 'english' && wordProblems.length === 0) ||
-               (gameMode === 'proverb' && proverbProblems.length === 0)
+               (gameMode === 'proverb' && proverbProblems.length === 0) ||
+               (gameMode === 'country' && countryProblems.length === 0)
   };
 };
