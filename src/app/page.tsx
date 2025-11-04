@@ -131,9 +131,9 @@ export default function Home() {
         </div>
 
         {/* 메인 콘텐츠 - 가로 레이아웃 (태블릿 가로 모드 최적화) */}
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-2 lg:gap-4 min-h-[calc(100vh-170px)]">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-1 lg:gap-4 min-h-[calc(100vh-170px)]">
           {/* 왼쪽: 문제 영역 (2/5 비율) */}
-          <div className="lg:col-span-2 bg-white rounded-xl lg:rounded-2xl shadow-xl p-4 lg:p-6 flex flex-col justify-center min-h-[350px] lg:min-h-[450px]">
+          <div className="lg:col-span-2 bg-white rounded-xl lg:rounded-2xl shadow-xl p-4 lg:p-6 flex flex-col justify-center min-h-[280px] lg:min-h-[450px]">
             {gameMode === 'english' ? (
               <div className="text-center">
                 <div className="text-4xl lg:text-6xl font-bold text-gray-800 mb-6 lg:mb-8">
@@ -253,7 +253,7 @@ export default function Home() {
           </div>
 
           {/* 오른쪽: 키보드 영역 (3/5 비율) */}
-          <div className="lg:col-span-3 bg-white rounded-2xl shadow-xl p-3 lg:p-6 flex items-center justify-center min-h-[400px] lg:min-h-[400px]">
+          <div className="lg:col-span-3 bg-white rounded-2xl shadow-xl p-2 lg:p-6 flex items-center justify-center min-h-[300px] lg:min-h-[400px]">
             {gameMode === 'english' ? (
               <EnglishKeyboard
                 onLetterClick={handleLetterClick}
