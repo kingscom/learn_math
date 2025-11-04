@@ -442,7 +442,7 @@ export default function Home() {
   };
 
   const handleClear = () => {
-    setUserAnswer('');
+    setUserAnswer(prev => prev.slice(0, -1));
   };
 
   const handleHint = () => {
@@ -675,7 +675,7 @@ export default function Home() {
                     disabled={showResult}
                     className="bg-green-500 hover:bg-green-600 disabled:bg-gray-300 text-white font-bold py-3 px-3 rounded-lg text-lg transition-colors min-w-[40px]"
                   >
-                    {letter.toUpperCase()}
+                    {letter}
                   </button>
                 ))}
               </div>
@@ -688,7 +688,7 @@ export default function Home() {
                     disabled={showResult}
                     className="bg-green-500 hover:bg-green-600 disabled:bg-gray-300 text-white font-bold py-3 px-3 rounded-lg text-lg transition-colors min-w-[40px]"
                   >
-                    {letter.toUpperCase()}
+                    {letter}
                   </button>
                 ))}
               </div>
@@ -701,7 +701,7 @@ export default function Home() {
                     disabled={showResult}
                     className="bg-green-500 hover:bg-green-600 disabled:bg-gray-300 text-white font-bold py-3 px-3 rounded-lg text-lg transition-colors min-w-[40px]"
                   >
-                    {letter.toUpperCase()}
+                    {letter}
                   </button>
                 ))}
               </div>
