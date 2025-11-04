@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  reactStrictMode: false, // StrictMode 비활성화로 중복 실행 방지
 };
 
 export default nextConfig;
