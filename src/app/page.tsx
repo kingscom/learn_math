@@ -336,9 +336,35 @@ export default function Home() {
   const [gameComplete, setGameComplete] = useState(false);
   const [showResult, setShowResult] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(10);
+  const [timeLeft, setTimeLeft] = useState(5);
   const [timerId, setTimerId] = useState<NodeJS.Timeout | null>(null);
   const [hintLevel, setHintLevel] = useState(0);
+
+  // 클래식 음악 배경 재생
+  useEffect(() => {
+    const audio = new Audio('https://www.soundjay.com/misc/sounds/clock-ticking-5.mp3');
+    // 클래식 음악 대신 무료 배경음악 사용 (실제 구현시에는 적절한 클래식 음악 파일 URL 사용)
+    const backgroundMusic = new Audio();
+    backgroundMusic.src = 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQYGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmYZHU3I3NDhTysGK2q+7uKYSQwOUqfm8btoiNH8sF8tQ5wkOm5BG';
+    
+    // 실제로는 클래식 음악 파일을 public 폴더에 넣고 사용
+    // backgroundMusic.src = '/classical-music.mp3';
+    backgroundMusic.loop = true;
+    backgroundMusic.volume = 0.3; // 볼륨 30%
+    
+    // 사용자 상호작용 후 음악 재생 (브라우저 정책상 필요)
+    const playMusic = () => {
+      backgroundMusic.play().catch(e => console.log('음악 재생 실패:', e));
+      document.removeEventListener('click', playMusic);
+    };
+    
+    document.addEventListener('click', playMusic);
+    
+    return () => {
+      backgroundMusic.pause();
+      document.removeEventListener('click', playMusic);
+    };
+  }, []);
 
   // 선택된 게임 모드에 따라 문제 생성
   useEffect(() => {
@@ -383,7 +409,7 @@ export default function Home() {
   useEffect(() => {
     if (gameMode === 'addition' || gameMode === 'multiplication') {
       if (!showResult && !gameComplete) {
-        setTimeLeft(10);
+        setTimeLeft(5);
         const timer = setInterval(() => {
           setTimeLeft(prev => {
             if (prev <= 1) {
@@ -503,7 +529,7 @@ export default function Home() {
     setScore(0);
     setGameComplete(false);
     setShowResult(false);
-    setTimeLeft(10);
+    setTimeLeft(5);
     setHintLevel(0);
     setGameMode('menu');
   };
@@ -519,7 +545,7 @@ export default function Home() {
     setScore(0);
     setGameComplete(false);
     setShowResult(false);
-    setTimeLeft(10);
+    setTimeLeft(5);
     setHintLevel(0);
   };
 
@@ -538,7 +564,7 @@ export default function Home() {
             >
               <div className="text-3xl mb-2">➕</div>
               <div>더하기</div>
-              <div className="text-sm opacity-80">5~19 범위 (10초 제한)</div>
+              <div className="text-sm opacity-80">5~19 범위 (5초 제한)</div>
             </button>
             
             <button
@@ -547,7 +573,7 @@ export default function Home() {
             >
               <div className="text-3xl mb-2">✖️</div>
               <div>곱하기</div>
-              <div className="text-sm opacity-80">2~9 범위 (10초 제한)</div>
+              <div className="text-sm opacity-80">2~9 범위 (5초 제한)</div>
             </button>
             
             <button
@@ -611,13 +637,13 @@ export default function Home() {
 
         {(gameMode === 'addition' || gameMode === 'multiplication') && !showResult && (
           <div className="mb-4">
-            <div className={`text-2xl font-bold text-center ${timeLeft <= 3 ? 'text-red-500' : 'text-blue-500'}`}>
+            <div className={`text-2xl font-bold text-center ${timeLeft <= 2 ? 'text-red-500' : 'text-blue-500'}`}>
               ⏰ {timeLeft}초
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
               <div 
-                className={`h-2 rounded-full transition-all duration-1000 ${timeLeft <= 3 ? 'bg-red-500' : 'bg-blue-500'}`}
-                style={{ width: `${(timeLeft / 10) * 100}%` }}
+                className={`h-2 rounded-full transition-all duration-1000 ${timeLeft <= 2 ? 'bg-red-500' : 'bg-blue-500'}`}
+                style={{ width: `${(timeLeft / 5) * 100}%` }}
               ></div>
             </div>
           </div>
