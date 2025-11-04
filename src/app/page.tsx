@@ -8,7 +8,10 @@ interface Problem {
   answer: number;
 }
 
+type GameMode = 'menu' | 'addition' | 'multiplication';
+
 export default function Home() {
+  const [gameMode, setGameMode] = useState<GameMode>('menu');
   const [problems, setProblems] = useState<Problem[]>([]);
   const [currentProblem, setCurrentProblem] = useState(0);
   const [userAnswer, setUserAnswer] = useState('');
@@ -17,27 +20,43 @@ export default function Home() {
   const [showResult, setShowResult] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
 
-  // 1~19 범위의 덧셈 문제 10개 생성
+  // 선택된 게임 모드에 따라 문제 생성
   useEffect(() => {
+    if (gameMode === 'menu') return;
+
     const generateProblems = () => {
       const newProblems: Problem[] = [];
       for (let i = 0; i < 10; i++) {
-        const num1 = Math.floor(Math.random() * 19) + 1;
-        const num2 = Math.floor(Math.random() * 19) + 1;
-        newProblems.push({
-          num1,
-          num2,
-          answer: num1 + num2
-        });
+        if (gameMode === 'addition') {
+          // 10~29 범위의 덧셈 문제
+          const num1 = Math.floor(Math.random() * 20) + 10;
+          const num2 = Math.floor(Math.random() * 20) + 10;
+          newProblems.push({
+            num1,
+            num2,
+            answer: num1 + num2
+          });
+        } else if (gameMode === 'multiplication') {
+          // 2~9 범위의 곱셈 문제
+          const num1 = Math.floor(Math.random() * 8) + 2;
+          const num2 = Math.floor(Math.random() * 8) + 2;
+          newProblems.push({
+            num1,
+            num2,
+            answer: num1 * num2
+          });
+        }
       }
       return newProblems;
     };
 
     setProblems(generateProblems());
-  }, []);
+  }, [gameMode]);
 
   const handleNumberClick = (num: string) => {
-    if (userAnswer.length < 2) {
+    // 곱셈의 경우 최대 81 (9×9), 덧셈의 경우 최대 58 (29+29)
+    const maxLength = gameMode === 'multiplication' ? 2 : 3;
+    if (userAnswer.length < maxLength) {
       setUserAnswer(prev => prev + num);
     }
   };
@@ -76,21 +95,49 @@ export default function Home() {
     setScore(0);
     setGameComplete(false);
     setShowResult(false);
-    const generateProblems = () => {
-      const newProblems: Problem[] = [];
-      for (let i = 0; i < 10; i++) {
-        const num1 = Math.floor(Math.random() * 19) + 1;
-        const num2 = Math.floor(Math.random() * 19) + 1;
-        newProblems.push({
-          num1,
-          num2,
-          answer: num1 + num2
-        });
-      }
-      return newProblems;
-    };
-    setProblems(generateProblems());
+    setGameMode('menu');
   };
+
+  const startGame = (mode: 'addition' | 'multiplication') => {
+    setGameMode(mode);
+    setCurrentProblem(0);
+    setUserAnswer('');
+    setScore(0);
+    setGameComplete(false);
+    setShowResult(false);
+  };
+
+  // 메뉴 화면
+  if (gameMode === 'menu') {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-green-100 to-blue-100">
+        <div className="text-center p-8 bg-white rounded-3xl shadow-2xl max-w-md mx-4">
+          <div className="text-6xl mb-6">🎓</div>
+          <h1 className="text-3xl font-bold text-gray-800 mb-6">수학 게임을 선택하세요!</h1>
+          
+          <div className="space-y-4">
+            <button
+              onClick={() => startGame('addition')}
+              className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-6 px-8 rounded-xl text-xl transition-colors shadow-lg"
+            >
+              <div className="text-3xl mb-2">➕</div>
+              <div>더하기</div>
+              <div className="text-sm opacity-80">10~29 범위</div>
+            </button>
+            
+            <button
+              onClick={() => startGame('multiplication')}
+              className="w-full bg-purple-500 hover:bg-purple-600 text-white font-bold py-6 px-8 rounded-xl text-xl transition-colors shadow-lg"
+            >
+              <div className="text-3xl mb-2">✖️</div>
+              <div>곱하기</div>
+              <div className="text-sm opacity-80">2~9 범위</div>
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (problems.length === 0) {
     return <div className="flex min-h-screen items-center justify-center">로딩 중...</div>;
@@ -110,12 +157,20 @@ export default function Home() {
             {score >= 6 && score < 8 && <div className="text-2xl">👍 잘했어요!</div>}
             {score < 6 && <div className="text-2xl">💪 다시 도전해보세요!</div>}
           </div>
-          <button
-            onClick={restartGame}
-            className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-8 rounded-full text-lg transition-colors"
-          >
-            다시 시작
-          </button>
+          <div className="space-y-3">
+            <button
+              onClick={() => setGameMode(gameMode)}
+              className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-8 rounded-full text-lg transition-colors"
+            >
+              같은 게임 다시하기
+            </button>
+            <button
+              onClick={restartGame}
+              className="w-full bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-8 rounded-full text-lg transition-colors"
+            >
+              메뉴로 돌아가기
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -131,7 +186,7 @@ export default function Home() {
 
         <div className="mb-8">
           <div className="text-4xl font-bold text-gray-800 mb-4">
-            {problems[currentProblem].num1} + {problems[currentProblem].num2} = ?
+            {problems[currentProblem].num1} {gameMode === 'addition' ? '+' : '×'} {problems[currentProblem].num2} = ?
           </div>
           
           <div className="text-3xl font-bold mb-6 h-12 flex items-center justify-center">
