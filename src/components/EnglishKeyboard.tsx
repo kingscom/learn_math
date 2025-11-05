@@ -27,9 +27,9 @@ export default function EnglishKeyboard({
               key={letter}
               onClick={() => onLetterClick(letter)}
               disabled={showResult}
-              className="bg-green-500 hover:bg-green-600 disabled:bg-gray-300 text-white font-bold py-2 px-2 lg:py-4 lg:px-4 rounded-lg text-base lg:text-2xl transition-colors min-w-[30px] lg:min-w-[60px] flex-1 max-w-[40px] lg:max-w-[60px]"
+              className="bg-white hover:bg-gray-100 disabled:bg-gray-300 text-black font-bold py-3 px-2 lg:py-4 lg:px-4 rounded-lg text-base lg:text-2xl transition-colors min-w-[32px] lg:min-w-[60px] flex-1 max-w-[40px] lg:max-w-[60px] shadow-md border border-gray-200"
             >
-              {letter}
+              {letter.toUpperCase()}
             </button>
           ))}
         </div>
@@ -41,9 +41,9 @@ export default function EnglishKeyboard({
               key={letter}
               onClick={() => onLetterClick(letter)}
               disabled={showResult}
-              className="bg-green-500 hover:bg-green-600 disabled:bg-gray-300 text-white font-bold py-2 px-2 lg:py-4 lg:px-4 rounded-lg text-base lg:text-2xl transition-colors min-w-[30px] lg:min-w-[60px] flex-1 max-w-[42px] lg:max-w-[60px]"
+              className="bg-white hover:bg-gray-100 disabled:bg-gray-300 text-black font-bold py-3 px-2 lg:py-4 lg:px-4 rounded-lg text-base lg:text-2xl transition-colors min-w-[32px] lg:min-w-[60px] flex-1 max-w-[42px] lg:max-w-[60px] shadow-md border border-gray-200"
             >
-              {letter}
+              {letter.toUpperCase()}
             </button>
           ))}
         </div>
@@ -55,33 +55,37 @@ export default function EnglishKeyboard({
               key={letter}
               onClick={() => onLetterClick(letter)}
               disabled={showResult}
-              className="bg-green-500 hover:bg-green-600 disabled:bg-gray-300 text-white font-bold py-2 px-2 lg:py-4 lg:px-4 rounded-lg text-base lg:text-2xl transition-colors min-w-[30px] lg:min-w-[60px] flex-1 max-w-[54px] lg:max-w-[60px]"
+              className="bg-white hover:bg-gray-100 disabled:bg-gray-300 text-black font-bold py-3 px-2 lg:py-4 lg:px-4 rounded-lg text-base lg:text-2xl transition-colors min-w-[32px] lg:min-w-[60px] flex-1 max-w-[48px] lg:max-w-[60px] shadow-md border border-gray-200"
             >
               {letter}
             </button>
           ))}
+          
+          {/* 백스페이스 버튼 */}
+          <button
+            onClick={onClear}
+            disabled={showResult}
+            className="bg-red-500 hover:bg-red-600 disabled:bg-gray-300 text-white font-bold py-3 px-2 lg:py-4 lg:px-4 rounded-lg text-base lg:text-2xl transition-colors min-w-[60px] lg:min-w-[80px] shadow-md border border-gray-200"
+          >
+            ←
+          </button>
         </div>
       </div>
       
-      <div className="grid grid-cols-3 gap-1 lg:gap-3">
+      {/* 네 번째 줄 - 하단 기능 버튼들 */}
+      <div className="flex justify-center gap-1 lg:gap-2">
         <button
           onClick={onHint}
           disabled={showResult || !canHint}
-          className="bg-orange-500 hover:bg-orange-600 disabled:bg-gray-300 text-white font-bold py-3 px-1 lg:py-5 lg:px-3 rounded-lg transition-colors text-xs lg:text-lg"
+          className="bg-orange-500 hover:bg-orange-600 disabled:bg-gray-300 text-white font-bold py-3 px-2 lg:py-4 lg:px-4 rounded-lg text-xs lg:text-lg transition-colors min-w-[60px] lg:min-w-[80px] shadow-md border border-gray-200"
         >
-          💡 힌트
+          힌트
         </button>
-        <button
-          onClick={onClear}
-          disabled={showResult}
-          className="bg-gray-500 hover:bg-gray-600 disabled:bg-gray-300 text-white font-bold py-3 px-1 lg:py-5 lg:px-3 rounded-lg transition-colors text-xs lg:text-lg"
-        >
-          지우기
-        </button>
+        
         <button
           onClick={onSubmit}
           disabled={showResult || userAnswer === ''}
-          className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300 text-white font-bold py-3 px-1 lg:py-5 lg:px-3 rounded-lg transition-colors text-xs lg:text-lg"
+          className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300 text-white font-bold py-3 px-2 lg:py-4 lg:px-4 rounded-lg text-xs lg:text-lg transition-colors min-w-[60px] lg:min-w-[80px] shadow-md border border-gray-200"
         >
           확인
         </button>

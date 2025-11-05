@@ -22,75 +22,81 @@ export default function KoreanKeyboard({
   return (
     <div className="w-full max-w-full">
       <div className="space-y-1 lg:space-y-2 mb-2 lg:mb-4">
-        {/* 첫 번째 줄 - 표준 한글 자판 첫 줄 */}
+        {/* 첫 번째 줄 */}
         <div className="flex justify-center gap-1 lg:gap-2">
           {['ㅂ','ㅈ','ㄷ','ㄱ','ㅅ','ㅛ','ㅕ','ㅑ','ㅐ','ㅔ'].map(char => (
             <button
               key={char}
               onClick={() => onKeyClick(char)}
               disabled={showResult}
-              className="bg-yellow-500 hover:bg-yellow-600 disabled:bg-gray-300 text-white font-bold py-2 px-2 lg:py-4 lg:px-4 rounded-lg text-base lg:text-2xl transition-colors min-w-[30px] lg:min-w-[60px] flex-1 max-w-[40px] lg:max-w-[60px]"
+              className="bg-white hover:bg-gray-100 disabled:bg-gray-300 text-black font-bold py-3 px-2 lg:py-4 lg:px-4 rounded-lg text-base lg:text-2xl transition-colors min-w-[32px] lg:min-w-[60px] flex-1 max-w-[40px] lg:max-w-[60px] shadow-md border border-gray-200"
             >
               {char}
             </button>
           ))}
         </div>
         
-        {/* 두 번째 줄 - 표준 한글 자판 둘째 줄 */}
+        {/* 두 번째 줄 */}
         <div className="flex justify-center gap-1 lg:gap-2">
           {['ㅁ','ㄴ','ㅇ','ㄹ','ㅎ','ㅗ','ㅓ','ㅏ','ㅣ'].map(char => (
             <button
               key={char}
               onClick={() => onKeyClick(char)}
               disabled={showResult}
-              className="bg-yellow-500 hover:bg-yellow-600 disabled:bg-gray-300 text-white font-bold py-2 px-2 lg:py-4 lg:px-4 rounded-lg text-base lg:text-2xl transition-colors min-w-[30px] lg:min-w-[60px] flex-1 max-w-[42px] lg:max-w-[60px]"
+              className="bg-white hover:bg-gray-100 disabled:bg-gray-300 text-black font-bold py-3 px-2 lg:py-4 lg:px-4 rounded-lg text-base lg:text-2xl transition-colors min-w-[32px] lg:min-w-[60px] flex-1 max-w-[42px] lg:max-w-[60px] shadow-md border border-gray-200"
             >
               {char}
             </button>
           ))}
         </div>
         
-        {/* 세 번째 줄 - 표준 한글 자판 셋째 줄 */}
+        {/* 세 번째 줄 */}
         <div className="flex justify-center gap-1 lg:gap-2">
           {['ㅋ','ㅌ','ㅊ','ㅍ','ㅠ','ㅜ','ㅡ'].map(char => (
             <button
               key={char}
               onClick={() => onKeyClick(char)}
               disabled={showResult}
-              className="bg-yellow-500 hover:bg-yellow-600 disabled:bg-gray-300 text-white font-bold py-2 px-2 lg:py-4 lg:px-4 rounded-lg text-base lg:text-2xl transition-colors min-w-[30px] lg:min-w-[60px] flex-1 max-w-[54px] lg:max-w-[60px]"
+              className="bg-white hover:bg-gray-100 disabled:bg-gray-300 text-black font-bold py-3 px-2 lg:py-4 lg:px-4 rounded-lg text-base lg:text-2xl transition-colors min-w-[32px] lg:min-w-[60px] flex-1 max-w-[48px] lg:max-w-[60px] shadow-md border border-gray-200"
             >
               {char}
             </button>
           ))}
+          
+          {/* 백스페이스 버튼 */}
+          <button
+            onClick={onClear}
+            disabled={showResult}
+            className="bg-red-500 hover:bg-red-600 disabled:bg-gray-300 text-white font-bold py-3 px-2 lg:py-4 lg:px-4 rounded-lg text-base lg:text-2xl transition-colors min-w-[60px] lg:min-w-[80px] shadow-md border border-gray-200"
+          >
+            ←
+          </button>
         </div>
       </div>
       
-      <div className="grid grid-cols-4 gap-1 lg:gap-3">
+      {/* 네 번째 줄 - 하단 기능 버튼들 */}
+      <div className="flex justify-center gap-1 lg:gap-2">
         <button
           onClick={onHint}
           disabled={showResult || !canHint}
-          className="bg-orange-500 hover:bg-orange-600 disabled:bg-gray-300 text-white font-bold py-3 px-1 lg:py-5 lg:px-3 rounded-lg transition-colors text-xs lg:text-lg"
+          className="bg-orange-500 hover:bg-orange-600 disabled:bg-gray-300 text-white font-bold py-3 px-2 lg:py-4 lg:px-4 rounded-lg text-xs lg:text-lg transition-colors min-w-[60px] lg:min-w-[80px] shadow-md border border-gray-200"
         >
-          💡 힌트
+          힌트
         </button>
+        
+        {/* 스페이스바 */}
         <button
           onClick={onSpace}
           disabled={showResult}
-          className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300 text-white font-bold py-3 px-1 lg:py-5 lg:px-3 rounded-lg transition-colors text-xs lg:text-lg"
+          className="bg-white hover:bg-gray-100 disabled:bg-gray-300 text-black font-bold py-3 px-2 lg:py-4 lg:px-4 rounded-lg text-xs lg:text-lg transition-colors flex-1 max-w-[250px] lg:max-w-[350px] shadow-md border border-gray-200"
         >
-          띄어쓰기
+          ⎵
         </button>
-        <button
-          onClick={onClear}
-          disabled={showResult}
-          className="bg-gray-500 hover:bg-gray-600 disabled:bg-gray-300 text-white font-bold py-3 px-1 lg:py-5 lg:px-3 rounded-lg transition-colors text-xs lg:text-lg"
-        >
-          지우기
-        </button>
+        
         <button
           onClick={onSubmit}
           disabled={showResult || userAnswer === ''}
-          className="bg-purple-500 hover:bg-purple-600 disabled:bg-gray-300 text-white font-bold py-3 px-1 lg:py-5 lg:px-3 rounded-lg transition-colors text-xs lg:text-lg"
+          className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300 text-white font-bold py-3 px-2 lg:py-4 lg:px-4 rounded-lg text-xs lg:text-lg transition-colors min-w-[60px] lg:min-w-[80px] shadow-md border border-gray-200"
         >
           확인
         </button>
