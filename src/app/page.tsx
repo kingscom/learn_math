@@ -19,6 +19,7 @@ export default function Home() {
     proverbProblems,
     countryProblems,
     historicalProblems,
+    riddleProblems,
     isFirstHalf,
     currentProblem,
     userAnswer,
@@ -118,16 +119,18 @@ export default function Home() {
             </div>
           </div>
 
-          {/* 타이머 (모든 게임 모드) */}
-          <div className="flex-1">
-            <div className="text-lg lg:text-xl font-bold text-red-600 mb-1 lg:mb-2">⏰ {timeLeft}초</div>
-            <div className="w-full bg-gray-200 rounded-full h-2 lg:h-3">
-              <div 
-                className="bg-red-500 h-2 lg:h-3 rounded-full transition-all duration-1000"
-                style={{ width: `${(timeLeft / 5) * 100}%` }}
-              ></div>
+          {/* 타이머 (수수께끼 제외) */}
+          {gameMode !== 'riddle' && (
+            <div className="flex-1">
+              <div className="text-lg lg:text-xl font-bold text-red-600 mb-1 lg:mb-2">⏰ {timeLeft}초</div>
+              <div className="w-full bg-gray-200 rounded-full h-2 lg:h-3">
+                <div 
+                  className="bg-red-500 h-2 lg:h-3 rounded-full transition-all duration-1000"
+                  style={{ width: `${(timeLeft / 5) * 100}%` }}
+                ></div>
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* 메인 콘텐츠 - 가로 레이아웃 (태블릿 가로 모드 최적화) */}
@@ -213,6 +216,20 @@ export default function Home() {
                   </div>
                 )}
               </div>
+            ) : gameMode === 'riddle' ? (
+              <div className="text-center">
+                <div className="text-3xl lg:text-5xl font-bold text-gray-800 mb-6 lg:mb-8">
+                  🧩 수수께끼
+                </div>
+                <div className="text-base lg:text-lg text-gray-700 mb-6 lg:mb-8 leading-relaxed px-4 text-left bg-yellow-50 rounded-lg p-4 lg:p-6">
+                  {riddleProblems[currentProblem]?.description}
+                </div>
+                {hintLevel > 0 && (
+                  <div className="text-base lg:text-lg text-blue-600 mb-4 lg:mb-6 bg-blue-50 rounded-lg p-3 lg:p-4 mx-4">
+                    💡 <strong>힌트:</strong> {riddleProblems[currentProblem]?.hint}
+                  </div>
+                )}
+              </div>
             ) : (
               <div className="text-center">
                 <div className="text-4xl lg:text-6xl font-bold text-gray-800 mb-4 lg:mb-6">
@@ -222,7 +239,7 @@ export default function Home() {
             )}
             
             {/* 답안 입력 표시 */}
-            {(gameMode === 'addition' || gameMode === 'multiplication') ? (
+            {(gameMode === 'addition' || gameMode === 'multiplication' || gameMode === 'riddle') ? (
               <div className="text-2xl lg:text-4xl font-bold mb-4 lg:mb-6 min-h-12 lg:min-h-16 flex items-center border-2 border-gray-300 relative bg-white rounded-lg px-4 py-2 mx-auto max-w-xs lg:max-w-lg shadow-inner overflow-hidden">
                 <div className="flex items-center w-full">
                   {userAnswer ? (
@@ -267,6 +284,7 @@ export default function Home() {
                         gameMode === 'proverb' ? (proverbProblems[currentProblem]?.isFirstHalf ? proverbProblems[currentProblem]?.second : proverbProblems[currentProblem]?.first) :
                         gameMode === 'country' ? (countryProblems[currentProblem]?.askCountry ? countryProblems[currentProblem]?.country : countryProblems[currentProblem]?.capital) :
                         gameMode === 'historical' ? historicalProblems[currentProblem]?.answer :
+                        gameMode === 'riddle' ? riddleProblems[currentProblem]?.answer :
                         problems[currentProblem]?.answer
                       }이에요
                     </span>
@@ -313,6 +331,17 @@ export default function Home() {
                 showResult={showResult}
                 userAnswer={userAnswer}
                 correctAnswer={historicalProblems[currentProblem]?.answer || ''}
+              />
+            ) : gameMode === 'riddle' ? (
+              <KoreanKeyboard
+                onKeyClick={handleKoreanClick}
+                onSpace={handleSpace}
+                onClear={handleClear}
+                onHint={handleHint}
+                onSubmit={handleSubmit}
+                showResult={showResult}
+                userAnswer={userAnswer}
+                canHint={hintLevel === 0}
               />
             ) : (
               <NumberKeypad

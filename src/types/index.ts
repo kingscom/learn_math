@@ -30,4 +30,10 @@ export interface HistoricalFigureProblem {
   choices?: string[]; // 4지선다 선택지
 }
 
-export type GameMode = 'menu' | 'addition' | 'multiplication' | 'english' | 'proverb' | 'country' | 'historical';
+export interface RiddleProblem {
+  description: string;
+  answer: string;
+  hint?: string;
+}
+
+export type GameMode = 'menu' | 'addition' | 'multiplication' | 'english' | 'proverb' | 'country' | 'historical' | 'riddle';
