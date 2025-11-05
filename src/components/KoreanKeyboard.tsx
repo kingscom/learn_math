@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 interface KoreanKeyboardProps {
   onKeyClick: (char: string) => void;
   onSpace: () => void;
@@ -19,6 +21,29 @@ export default function KoreanKeyboard({
   userAnswer,
   canHint
 }: KoreanKeyboardProps) {
+  const [isShiftPressed, setIsShiftPressed] = useState(false);
+
+  // 쌍자음 매핑
+  const doubleConsonants: { [key: string]: string } = {
+    'ㄱ': 'ㄲ',
+    'ㄷ': 'ㄸ',
+    'ㅂ': 'ㅃ',
+    'ㅅ': 'ㅆ',
+    'ㅈ': 'ㅉ'
+  };
+
+  const handleKeyClick = (char: string) => {
+    if (isShiftPressed && doubleConsonants[char]) {
+      onKeyClick(doubleConsonants[char]);
+      setIsShiftPressed(false); // 쌍자음 입력 후 쉬프트 해제
+    } else {
+      onKeyClick(char);
+    }
+  };
+
+  const toggleShift = () => {
+    setIsShiftPressed(!isShiftPressed);
+  };
   return (
     <div className="w-full max-w-full px-2 lg:px-0">
       <div className="space-y-2 lg:space-y-2 mb-3 lg:mb-4">
@@ -27,11 +52,15 @@ export default function KoreanKeyboard({
           {['ㅂ','ㅈ','ㄷ','ㄱ','ㅅ','ㅛ','ㅕ','ㅑ','ㅐ','ㅔ'].map(char => (
             <button
               key={char}
-              onClick={() => onKeyClick(char)}
+              onClick={() => handleKeyClick(char)}
               disabled={showResult}
-              className="bg-white hover:bg-gray-100 disabled:bg-gray-300 text-black font-bold py-3 px-1 lg:py-4 lg:px-4 rounded-lg text-base lg:text-2xl transition-colors flex-1 shadow-md border border-gray-200"
+              className={`font-bold py-3 px-1 lg:py-4 lg:px-4 rounded-lg text-base lg:text-2xl transition-colors flex-1 shadow-md border border-gray-200 ${
+                isShiftPressed && doubleConsonants[char]
+                  ? 'bg-blue-200 hover:bg-blue-300 text-blue-800'
+                  : 'bg-white hover:bg-gray-100 disabled:bg-gray-300 text-black'
+              }`}
             >
-              {char}
+              {isShiftPressed && doubleConsonants[char] ? doubleConsonants[char] : char}
             </button>
           ))}
         </div>
@@ -42,7 +71,7 @@ export default function KoreanKeyboard({
           {['ㅁ','ㄴ','ㅇ','ㄹ','ㅎ','ㅗ','ㅓ','ㅏ','ㅣ'].map(char => (
             <button
               key={char}
-              onClick={() => onKeyClick(char)}
+              onClick={() => handleKeyClick(char)}
               disabled={showResult}
               className="bg-white hover:bg-gray-100 disabled:bg-gray-300 text-black font-bold py-3 px-1 lg:py-4 lg:px-4 rounded-lg text-base lg:text-2xl transition-colors flex-1 shadow-md border border-gray-200"
             >
@@ -52,13 +81,26 @@ export default function KoreanKeyboard({
           <div className="flex-1"></div>
         </div>
         
-        {/* 세 번째 줄 - 7개 + 백스페이스 */}
+        {/* 세 번째 줄 - 쉬프트 + 7개 + 백스페이스 */}
         <div className="flex gap-1 lg:gap-2">
-          <div className="flex-1"></div>
+          {/* 쉬프트 버튼 */}
+          <button
+            onClick={toggleShift}
+            disabled={showResult}
+            className={`font-bold py-3 px-2 lg:py-4 lg:px-4 rounded-lg text-sm lg:text-base transition-colors shadow-md border border-gray-200 ${
+              isShiftPressed
+                ? 'bg-blue-500 hover:bg-blue-600 text-white'
+                : 'bg-gray-200 hover:bg-gray-300 text-gray-700'
+            }`}
+            style={{ flex: '1.2' }}
+          >
+            ⇧
+          </button>
+          
           {['ㅋ','ㅌ','ㅊ','ㅍ','ㅠ','ㅜ','ㅡ'].map(char => (
             <button
               key={char}
-              onClick={() => onKeyClick(char)}
+              onClick={() => handleKeyClick(char)}
               disabled={showResult}
               className="bg-white hover:bg-gray-100 disabled:bg-gray-300 text-black font-bold py-3 px-1 lg:py-4 lg:px-4 rounded-lg text-base lg:text-2xl transition-colors flex-1 shadow-md border border-gray-200"
             >
