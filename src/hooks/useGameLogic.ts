@@ -35,7 +35,7 @@ export const useGameLogic = () => {
   }, [userAnswer]);
 
   // 게임 시작 함수
-  const startGame = (mode: 'addition' | 'multiplication' | 'english' | 'proverb' | 'country' | 'historical' | 'riddle') => {
+  const startGame = (mode: GameMode) => {
     if (timerId) {
       clearInterval(timerId);
       setTimerId(null);
@@ -155,9 +155,6 @@ export const useGameLogic = () => {
             } else if (gameMode === 'historical') {
               const correctAnswer = historicalProblems[currentProblem]?.answer || '';
               correct = currentUserAnswer.trim() === correctAnswer;
-            } else if (gameMode === 'riddle') {
-              const correctAnswer = riddleProblems[currentProblem]?.answer || '';
-              correct = currentUserAnswer.trim() === correctAnswer;
             } else {
               const userNum = parseInt(currentUserAnswer);
               correct = userNum === problems[currentProblem]?.answer;
@@ -174,7 +171,6 @@ export const useGameLogic = () => {
                                    gameMode === 'proverb' ? proverbProblems.length : 
                                    gameMode === 'country' ? countryProblems.length : 
                                    gameMode === 'historical' ? historicalProblems.length :
-                                   gameMode === 'riddle' ? riddleProblems.length :
                                    problems.length;
               if (currentProblem < problemsLength - 1) {
                 setCurrentProblem(prev => prev + 1);
