@@ -222,18 +222,20 @@ export default function Home() {
             )}
             
             {/* 답안 입력 표시 */}
-            <div className="text-3xl lg:text-5xl font-bold mb-4 lg:mb-6 h-12 lg:h-16 flex items-center justify-center border-b-4 border-gray-300 relative bg-gray-50 rounded-lg px-4">
-              {userAnswer ? (
-                <span className="flex items-center">
-                  {userAnswer}
-                  <span className="w-1 h-8 lg:h-12 bg-blue-500 ml-1 cursor-blink"></span>
-                </span>
-              ) : (
-                <span className="flex items-center text-gray-400">
-                  답을 입력하세요
-                  <span className="w-1 h-8 lg:h-12 bg-blue-400 ml-3 cursor-blink"></span>
-                </span>
-              )}
+            <div className="text-2xl lg:text-4xl font-bold mb-4 lg:mb-6 min-h-12 lg:min-h-16 flex items-center border-2 border-gray-300 relative bg-white rounded-lg px-4 py-2 mx-auto max-w-xs lg:max-w-lg shadow-inner overflow-hidden">
+              <div className="flex items-center w-full">
+                {userAnswer ? (
+                  <>
+                    <span className="whitespace-pre-wrap break-all">{userAnswer}</span>
+                    <span className="w-0.5 h-6 lg:h-8 bg-blue-500 ml-0.5 cursor-blink flex-shrink-0"></span>
+                  </>
+                ) : (
+                  <>
+                    <span className="text-gray-400 select-none">답을 입력하세요</span>
+                    <span className="w-0.5 h-6 lg:h-8 bg-blue-400 ml-2 cursor-blink flex-shrink-0"></span>
+                  </>
+                )}
+              </div>
             </div>
 
             {/* 결과 표시 */}
