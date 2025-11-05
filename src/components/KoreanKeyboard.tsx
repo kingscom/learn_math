@@ -32,10 +32,19 @@ export default function KoreanKeyboard({
     'ㅈ': 'ㅉ'
   };
 
+  // 쌍모음 매핑 (ㅐ/ㅒ, ㅔ/ㅖ)
+  const doubleVowels: { [key: string]: string } = {
+    'ㅐ': 'ㅒ',
+    'ㅔ': 'ㅖ'
+  };
+
   const handleKeyClick = (char: string) => {
     if (isShiftPressed && doubleConsonants[char]) {
       onKeyClick(doubleConsonants[char]);
       setIsShiftPressed(false); // 쌍자음 입력 후 쉬프트 해제
+    } else if (isShiftPressed && doubleVowels[char]) {
+      onKeyClick(doubleVowels[char]);
+      setIsShiftPressed(false); // 쌍모음 입력 후 쉬프트 해제
     } else {
       onKeyClick(char);
     }
@@ -55,12 +64,16 @@ export default function KoreanKeyboard({
               onClick={() => handleKeyClick(char)}
               disabled={showResult}
               className={`font-bold py-3 px-1 lg:py-4 lg:px-4 rounded-lg text-base lg:text-2xl transition-colors flex-1 shadow-md border border-gray-200 ${
-                isShiftPressed && doubleConsonants[char]
+                isShiftPressed && (doubleConsonants[char] || doubleVowels[char])
                   ? 'bg-blue-200 hover:bg-blue-300 text-blue-800'
                   : 'bg-white hover:bg-gray-100 disabled:bg-gray-300 text-black'
               }`}
             >
-              {isShiftPressed && doubleConsonants[char] ? doubleConsonants[char] : char}
+              {isShiftPressed && doubleConsonants[char] 
+                ? doubleConsonants[char] 
+                : isShiftPressed && doubleVowels[char] 
+                ? doubleVowels[char] 
+                : char}
             </button>
           ))}
         </div>
