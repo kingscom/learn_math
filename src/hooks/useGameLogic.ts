@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { GameMode, Problem, WordProblem, ProverbProblem, CountryProblem, HistoricalFigureProblem } from '../types';
 import { englishWords } from '../data/englishWords';
 import { koreanProverbs } from '../data/koreanProverbs';
 import { countries } from '../data/countries';
 import { historicalFigures } from '../data/historicalFigures';
-import { generateMathProblems, getRandomItems } from '../utils/gameUtils';
+import { generateMathProblems, getRandomItems, generateChoices } from '../utils/gameUtils';
 
 export const useGameLogic = () => {
   const [gameMode, setGameMode] = useState<GameMode>('menu');
@@ -23,6 +23,14 @@ export const useGameLogic = () => {
   const [timeLeft, setTimeLeft] = useState(5);
   const [timerId, setTimerId] = useState<NodeJS.Timeout | null>(null);
   const [hintLevel, setHintLevel] = useState(0);
+  
+  // userAnswer의 최신 값을 참조하기 위한 ref
+  const userAnswerRef = useRef(userAnswer);
+  
+  // userAnswer가 변경될 때마다 ref 업데이트
+  useEffect(() => {
+    userAnswerRef.current = userAnswer;
+  }, [userAnswer]);
 
   // 게임 시작 함수
   const startGame = (mode: 'addition' | 'multiplication' | 'english' | 'proverb' | 'country' | 'historical') => {
@@ -67,66 +75,119 @@ export const useGameLogic = () => {
 
     if (gameMode === 'english') {
       const shuffled = getRandomItems(englishWords, 10);
-      setWordProblems(shuffled);
+      // 4지선다 선택지 생성
+      const problemsWithChoices = shuffled.map(problem => ({
+        ...problem,
+        choices: generateChoices(problem.english, englishWords.map(w => w.english))
+      }));
+      setWordProblems(problemsWithChoices);
     } else if (gameMode === 'proverb') {
       // 속담을 랜덤하게 섞고 각각에 대해 앞/뒤를 랜덤 선택
       const shuffledProverbs = getRandomItems(koreanProverbs, 10);
-      const proverbsWithRandomHalf = shuffledProverbs.map(proverb => ({
-        ...proverb,
-        isFirstHalf: Math.random() > 0.5
-      }));
+      const proverbsWithRandomHalf = shuffledProverbs.map(proverb => {
+        const isFirstHalf = Math.random() > 0.5;
+        const correctAnswer = isFirstHalf ? proverb.second : proverb.first;
+        // 모든 속담의 첫 번째/두 번째 부분을 선택지 풀로 사용
+        const allAnswers = koreanProverbs.flatMap(p => [p.first, p.second]);
+        return {
+          ...proverb,
+          isFirstHalf,
+          choices: generateChoices(correctAnswer, allAnswers)
+        };
+      });
       setProverbProblems(proverbsWithRandomHalf);
     } else if (gameMode === 'country') {
       // 나라-수도를 랜덤하게 섞고 각각에 대해 나라/수도 중 어느 것을 물어볼지 랜덤 선택
       const shuffledCountries = getRandomItems(countries, 10);
-      const countriesWithRandomQuestion = shuffledCountries.map(country => ({
-        ...country,
-        askCountry: Math.random() > 0.5 // true면 수도를 주고 나라를 맞추기
-      }));
+      const countriesWithRandomQuestion = shuffledCountries.map(country => {
+        const askCountry = Math.random() > 0.5; // true면 수도를 주고 나라를 맞추기
+        const correctAnswer = askCountry ? country.country : country.capital;
+        const allAnswers = askCountry 
+          ? countries.map(c => c.country)
+          : countries.map(c => c.capital);
+        return {
+          ...country,
+          askCountry,
+          choices: generateChoices(correctAnswer, allAnswers)
+        };
+      });
       setCountryProblems(countriesWithRandomQuestion);
     } else if (gameMode === 'historical') {
       const shuffledHistorical = getRandomItems(historicalFigures, 10);
-      setHistoricalProblems(shuffledHistorical);
+      const historicalWithChoices = shuffledHistorical.map(figure => ({
+        ...figure,
+        choices: generateChoices(figure.answer, historicalFigures.map(f => f.answer))
+      }));
+      setHistoricalProblems(historicalWithChoices);
     } else {
       const newProblems = generateMathProblems(gameMode);
       setProblems(newProblems);
     }
   }, [gameMode]);
 
-  // 타이머 useEffect (수학 문제에만 적용)
+  // 타이머 useEffect (모든 게임 모드에 적용)
   useEffect(() => {
-    if (gameMode === 'addition' || gameMode === 'multiplication') {
-      if (!showResult && !gameComplete) {
-        setTimeLeft(5);
-        const timer = setInterval(() => {
-          setTimeLeft(prev => {
-            if (prev <= 1) {
-              setIsCorrect(false);
-              setShowResult(true);
-              setTimeout(() => {
-                const problemsLength = problems.length;
-                if (currentProblem < problemsLength - 1) {
-                  setCurrentProblem(prev => prev + 1);
-                  setUserAnswer('');
-                  setShowResult(false);
-                  setHintLevel(0);
-                } else {
-                  setGameComplete(true);
-                }
-              }, 1500);
-              return 0;
+    if (gameMode !== 'menu' && !showResult && !gameComplete) {
+      setTimeLeft(5);
+      const timer = setInterval(() => {
+        setTimeLeft(prev => {
+          if (prev <= 1) {
+            // 시간 초과시 현재 선택된 답안으로 정답 체크
+            let correct = false;
+            const currentUserAnswer = userAnswerRef.current;
+            
+            if (gameMode === 'english') {
+              const correctAnswer = wordProblems[currentProblem]?.english?.toLowerCase() || '';
+              correct = currentUserAnswer.toLowerCase() === correctAnswer;
+            } else if (gameMode === 'proverb') {
+              const currentProverbProblem = proverbProblems[currentProblem];
+              const correctAnswer = currentProverbProblem?.isFirstHalf ? currentProverbProblem?.second : currentProverbProblem?.first;
+              correct = currentUserAnswer.trim() === correctAnswer;
+            } else if (gameMode === 'country') {
+              const currentCountryProblem = countryProblems[currentProblem];
+              const correctAnswer = currentCountryProblem?.askCountry ? currentCountryProblem?.country : currentCountryProblem?.capital;
+              correct = currentUserAnswer.trim() === correctAnswer;
+            } else if (gameMode === 'historical') {
+              const correctAnswer = historicalProblems[currentProblem]?.answer || '';
+              correct = currentUserAnswer.trim() === correctAnswer;
+            } else {
+              const userNum = parseInt(currentUserAnswer);
+              correct = userNum === problems[currentProblem]?.answer;
             }
-            return prev - 1;
-          });
-        }, 1000);
-        setTimerId(timer);
-        
-        return () => {
-          clearInterval(timer);
-        };
-      }
+            
+            setIsCorrect(correct);
+            if (correct) {
+              setScore(prev => prev + 1);
+            }
+            setShowResult(true);
+            
+            setTimeout(() => {
+              const problemsLength = gameMode === 'english' ? wordProblems.length : 
+                                   gameMode === 'proverb' ? proverbProblems.length : 
+                                   gameMode === 'country' ? countryProblems.length : 
+                                   gameMode === 'historical' ? historicalProblems.length :
+                                   problems.length;
+              if (currentProblem < problemsLength - 1) {
+                setCurrentProblem(prev => prev + 1);
+                setUserAnswer('');
+                setShowResult(false);
+                setHintLevel(0);
+              } else {
+                setGameComplete(true);
+              }
+            }, 1500);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+      setTimerId(timer);
+      
+      return () => {
+        clearInterval(timer);
+      };
     }
-  }, [currentProblem, gameMode, showResult, gameComplete, problems.length]);
+  }, [currentProblem, gameMode, showResult, gameComplete, problems.length, wordProblems.length, proverbProblems.length, countryProblems.length, historicalProblems.length]);
 
   // 답안 제출 함수
   const handleSubmit = () => {
@@ -183,6 +244,11 @@ export const useGameLogic = () => {
     }, 1500);
   };
 
+  // 4지선다 선택 함수
+  const handleChoiceSelect = (choice: string) => {
+    setUserAnswer(choice);
+  };
+
   // 힌트 함수
   const handleHint = () => {
     if (gameMode === 'english' && wordProblems.length > 0) {
@@ -230,6 +296,7 @@ export const useGameLogic = () => {
     restartGame,
     handleSubmit,
     handleHint,
+    handleChoiceSelect,
     
     // Utils
     isLoading: (gameMode !== 'english' && gameMode !== 'proverb' && gameMode !== 'country' && gameMode !== 'historical' && problems.length === 0) || 

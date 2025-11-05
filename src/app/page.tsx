@@ -9,6 +9,7 @@ import GameComplete from '../components/GameComplete';
 import KoreanKeyboard from '../components/KoreanKeyboard';
 import EnglishKeyboard from '../components/EnglishKeyboard';
 import NumberKeypad from '../components/NumberKeypad';
+import MultipleChoice from '../components/MultipleChoice';
 
 export default function Home() {
   const {
@@ -32,6 +33,7 @@ export default function Home() {
     restartGame,
     handleSubmit,
     handleHint,
+    handleChoiceSelect,
     isLoading
   } = useGameLogic();
 
@@ -116,18 +118,16 @@ export default function Home() {
             </div>
           </div>
 
-          {/* 타이머 (수학 게임만) */}
-          {(gameMode === 'addition' || gameMode === 'multiplication') && (
-            <div className="flex-1">
-              <div className="text-lg lg:text-xl font-bold text-red-600 mb-1 lg:mb-2">⏰ {timeLeft}초</div>
-              <div className="w-full bg-gray-200 rounded-full h-2 lg:h-3">
-                <div 
-                  className="bg-red-500 h-2 lg:h-3 rounded-full transition-all duration-1000"
-                  style={{ width: `${(timeLeft / 5) * 100}%` }}
-                ></div>
-              </div>
+          {/* 타이머 (모든 게임 모드) */}
+          <div className="flex-1">
+            <div className="text-lg lg:text-xl font-bold text-red-600 mb-1 lg:mb-2">⏰ {timeLeft}초</div>
+            <div className="w-full bg-gray-200 rounded-full h-2 lg:h-3">
+              <div 
+                className="bg-red-500 h-2 lg:h-3 rounded-full transition-all duration-1000"
+                style={{ width: `${(timeLeft / 5) * 100}%` }}
+              ></div>
             </div>
-          )}
+          </div>
         </div>
 
         {/* 메인 콘텐츠 - 가로 레이아웃 (태블릿 가로 모드 최적화) */}
@@ -222,21 +222,33 @@ export default function Home() {
             )}
             
             {/* 답안 입력 표시 */}
-            <div className="text-2xl lg:text-4xl font-bold mb-4 lg:mb-6 min-h-12 lg:min-h-16 flex items-center border-2 border-gray-300 relative bg-white rounded-lg px-4 py-2 mx-auto max-w-xs lg:max-w-lg shadow-inner overflow-hidden">
-              <div className="flex items-center w-full">
+            {(gameMode === 'addition' || gameMode === 'multiplication') ? (
+              <div className="text-2xl lg:text-4xl font-bold mb-4 lg:mb-6 min-h-12 lg:min-h-16 flex items-center border-2 border-gray-300 relative bg-white rounded-lg px-4 py-2 mx-auto max-w-xs lg:max-w-lg shadow-inner overflow-hidden">
+                <div className="flex items-center w-full">
+                  {userAnswer ? (
+                    <>
+                      <span className="whitespace-pre-wrap break-all">{userAnswer}</span>
+                      <span className="w-0.5 h-6 lg:h-8 bg-blue-500 ml-0.5 cursor-blink flex-shrink-0"></span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="text-gray-400 select-none">답을 입력하세요</span>
+                      <span className="w-0.5 h-6 lg:h-8 bg-blue-400 ml-2 cursor-blink flex-shrink-0"></span>
+                    </>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="text-xl lg:text-2xl font-bold mb-4 lg:mb-6 min-h-8 lg:min-h-12 flex items-center justify-center">
                 {userAnswer ? (
-                  <>
-                    <span className="whitespace-pre-wrap break-all">{userAnswer}</span>
-                    <span className="w-0.5 h-6 lg:h-8 bg-blue-500 ml-0.5 cursor-blink flex-shrink-0"></span>
-                  </>
+                  <div className="bg-blue-100 border-2 border-blue-300 rounded-lg px-4 py-2">
+                    선택한 답: <span className="text-blue-700">{userAnswer}</span>
+                  </div>
                 ) : (
-                  <>
-                    <span className="text-gray-400 select-none">답을 입력하세요</span>
-                    <span className="w-0.5 h-6 lg:h-8 bg-blue-400 ml-2 cursor-blink flex-shrink-0"></span>
-                  </>
+                  <div className="text-gray-500">아래에서 정답을 선택하세요</div>
                 )}
               </div>
-            </div>
+            )}
 
             {/* 결과 표시 */}
             {showResult && (
@@ -264,50 +276,43 @@ export default function Home() {
             )}
           </div>
 
-          {/* 오른쪽: 키보드 영역 (3/5 비율) */}
+          {/* 오른쪽: 키보드/선택지 영역 (3/5 비율) */}
           <div className="lg:col-span-3 bg-white rounded-2xl shadow-xl p-2 lg:p-6 flex items-center justify-center min-h-[300px] lg:min-h-[400px]">
             {gameMode === 'english' ? (
-              <EnglishKeyboard
-                onLetterClick={handleLetterClick}
-                onClear={handleClear}
-                onHint={handleHint}
+              <MultipleChoice
+                choices={wordProblems[currentProblem]?.choices || []}
+                onChoiceSelect={handleChoiceSelect}
                 onSubmit={handleSubmit}
                 showResult={showResult}
                 userAnswer={userAnswer}
-                canHint={hintLevel < wordProblems[currentProblem]?.english.length}
+                correctAnswer={wordProblems[currentProblem]?.english || ''}
               />
             ) : gameMode === 'proverb' ? (
-              <KoreanKeyboard
-                onKeyClick={handleKoreanClick}
-                onSpace={handleSpace}
-                onClear={handleClear}
-                onHint={handleHint}
+              <MultipleChoice
+                choices={proverbProblems[currentProblem]?.choices || []}
+                onChoiceSelect={handleChoiceSelect}
                 onSubmit={handleSubmit}
                 showResult={showResult}
                 userAnswer={userAnswer}
-                canHint={hintLevel < (proverbProblems[currentProblem]?.isFirstHalf ? proverbProblems[currentProblem]?.second : proverbProblems[currentProblem]?.first)?.length}
+                correctAnswer={proverbProblems[currentProblem]?.isFirstHalf ? proverbProblems[currentProblem]?.second || '' : proverbProblems[currentProblem]?.first || ''}
               />
             ) : gameMode === 'country' ? (
-              <KoreanKeyboard
-                onKeyClick={handleKoreanClick}
-                onSpace={handleSpace}
-                onClear={handleClear}
-                onHint={handleHint}
+              <MultipleChoice
+                choices={countryProblems[currentProblem]?.choices || []}
+                onChoiceSelect={handleChoiceSelect}
                 onSubmit={handleSubmit}
                 showResult={showResult}
                 userAnswer={userAnswer}
-                canHint={hintLevel < (countryProblems[currentProblem]?.askCountry ? countryProblems[currentProblem]?.country : countryProblems[currentProblem]?.capital)?.length}
+                correctAnswer={countryProblems[currentProblem]?.askCountry ? countryProblems[currentProblem]?.country || '' : countryProblems[currentProblem]?.capital || ''}
               />
             ) : gameMode === 'historical' ? (
-              <KoreanKeyboard
-                onKeyClick={handleKoreanClick}
-                onSpace={handleSpace}
-                onClear={handleClear}
-                onHint={handleHint}
+              <MultipleChoice
+                choices={historicalProblems[currentProblem]?.choices || []}
+                onChoiceSelect={handleChoiceSelect}
                 onSubmit={handleSubmit}
                 showResult={showResult}
                 userAnswer={userAnswer}
-                canHint={hintLevel < historicalProblems[currentProblem]?.answer.length}
+                correctAnswer={historicalProblems[currentProblem]?.answer || ''}
               />
             ) : (
               <NumberKeypad
