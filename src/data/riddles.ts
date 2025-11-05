@@ -287,7 +287,7 @@ export const riddles: RiddleProblem[] = [
   },
   {
     description: "세상에서 가장 무서운 숫자는?",
-    answer: "4",
+    answer: "사",
     hint: "'죽음'과 관련된 숫자예요."
   },
   {
