@@ -1,7 +1,7 @@
 import { GameMode } from '../types';
 
 interface GameMenuProps {
-  onStartGame: (mode: 'addition' | 'multiplication' | 'english' | 'proverb' | 'country' | 'historical' | 'riddle') => void;
+  onStartGame: (mode: 'addition' | 'multiplication' | 'division' | 'english' | 'english2' | 'proverb' | 'country' | 'historical' | 'riddle') => void;
 }
 
 export default function GameMenu({ onStartGame }: GameMenuProps) {
@@ -31,12 +31,30 @@ export default function GameMenu({ onStartGame }: GameMenuProps) {
           </button>
           
           <button
+            onClick={() => onStartGame('division')}
+            className="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-6 px-8 rounded-xl text-xl transition-colors shadow-lg"
+          >
+            <div className="text-3xl mb-2">➗</div>
+            <div>나누기</div>
+            <div className="text-sm opacity-80">나머지 없이</div>
+          </button>
+          
+          <button
             onClick={() => onStartGame('english')}
             className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-6 px-8 rounded-xl text-xl transition-colors shadow-lg"
           >
             <div className="text-3xl mb-2">🔤</div>
             <div>영어 단어</div>
             <div className="text-sm opacity-80">초등 1학년 수준</div>
+          </button>
+          
+          <button
+            onClick={() => onStartGame('english2')}
+            className="w-full bg-teal-500 hover:bg-teal-600 text-white font-bold py-6 px-8 rounded-xl text-xl transition-colors shadow-lg"
+          >
+            <div className="text-3xl mb-2">🎓</div>
+            <div>영어 단어2</div>
+            <div className="text-sm opacity-80">초등 2학년 수준</div>
           </button>
           
           <button

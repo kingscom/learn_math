@@ -16,6 +16,7 @@ export default function Home() {
     gameMode,
     problems,
     wordProblems,
+    wordProblems2,
     proverbProblems,
     countryProblems,
     historicalProblems,
@@ -148,6 +149,17 @@ export default function Home() {
                   </div>
                 )}
               </div>
+            ) : gameMode === 'english2' ? (
+              <div className="text-center">
+                <div className="text-4xl lg:text-6xl font-bold text-gray-800 mb-6 lg:mb-8">
+                  {wordProblems2[currentProblem]?.korean}
+                </div>
+                {hintLevel > 0 && (
+                  <div className="text-2xl lg:text-4xl text-blue-600 mb-4 lg:mb-6">
+                    💡 힌트: {wordProblems2[currentProblem]?.english.substring(0, hintLevel)}...
+                  </div>
+                )}
+              </div>
             ) : gameMode === 'proverb' ? (
               <div className="text-center">
                 <div className="text-3xl lg:text-5xl font-bold text-gray-800 mb-6 lg:mb-8">
@@ -233,13 +245,13 @@ export default function Home() {
             ) : (
               <div className="text-center">
                 <div className="text-4xl lg:text-6xl font-bold text-gray-800 mb-4 lg:mb-6">
-                  {problems[currentProblem]?.num1} {gameMode === 'addition' ? '+' : '×'} {problems[currentProblem]?.num2} = ?
+                  {problems[currentProblem]?.num1} {gameMode === 'addition' ? '+' : gameMode === 'multiplication' ? '×' : '÷'} {problems[currentProblem]?.num2} = ?
                 </div>
               </div>
             )}
             
             {/* 답안 입력 표시 */}
-            {(gameMode === 'addition' || gameMode === 'multiplication' || gameMode === 'riddle') ? (
+            {(gameMode === 'addition' || gameMode === 'multiplication' || gameMode === 'division' || gameMode === 'riddle') ? (
               <div className="text-2xl lg:text-4xl font-bold mb-4 lg:mb-6 min-h-12 lg:min-h-16 flex items-center border-2 border-gray-300 relative bg-white rounded-lg px-4 py-2 mx-auto max-w-xs lg:max-w-lg shadow-inner overflow-hidden">
                 <div className="flex items-center w-full">
                   {userAnswer ? (
@@ -304,6 +316,15 @@ export default function Home() {
                 showResult={showResult}
                 userAnswer={userAnswer}
                 correctAnswer={wordProblems[currentProblem]?.english || ''}
+              />
+            ) : gameMode === 'english2' ? (
+              <MultipleChoice
+                choices={wordProblems2[currentProblem]?.choices || []}
+                onChoiceSelect={handleChoiceSelect}
+                onSubmit={handleSubmit}
+                showResult={showResult}
+                userAnswer={userAnswer}
+                correctAnswer={wordProblems2[currentProblem]?.english || ''}
               />
             ) : gameMode === 'proverb' ? (
               <MultipleChoice

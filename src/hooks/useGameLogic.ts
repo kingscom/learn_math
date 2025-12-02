@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { GameMode, Problem, WordProblem, ProverbProblem, CountryProblem, HistoricalFigureProblem, RiddleProblem } from '../types';
 import { englishWords } from '../data/englishWords';
+import { englishWords2 } from '../data/englishWords2';
 import { koreanProverbs } from '../data/koreanProverbs';
 import { countries } from '../data/countries';
 import { historicalFigures } from '../data/historicalFigures';
@@ -11,6 +12,7 @@ export const useGameLogic = () => {
   const [gameMode, setGameMode] = useState<GameMode>('menu');
   const [problems, setProblems] = useState<Problem[]>([]);
   const [wordProblems, setWordProblems] = useState<WordProblem[]>([]);
+  const [wordProblems2, setWordProblems2] = useState<WordProblem[]>([]);
   const [proverbProblems, setProverbProblems] = useState<ProverbProblem[]>([]);
   const [countryProblems, setCountryProblems] = useState<CountryProblem[]>([]);
   const [historicalProblems, setHistoricalProblems] = useState<HistoricalFigureProblem[]>([]);
@@ -83,6 +85,14 @@ export const useGameLogic = () => {
         choices: generateChoices(problem.english, englishWords.map(w => w.english))
       }));
       setWordProblems(problemsWithChoices);
+    } else if (gameMode === 'english2') {
+      const shuffled = getRandomItems(englishWords2, 10);
+      // 4지선다 선택지 생성
+      const problemsWithChoices = shuffled.map(problem => ({
+        ...problem,
+        choices: generateChoices(problem.english, englishWords2.map(w => w.english))
+      }));
+      setWordProblems2(problemsWithChoices);
     } else if (gameMode === 'proverb') {
       // 속담을 랜덤하게 섞고 각각에 대해 앞/뒤를 랜덤 선택
       const shuffledProverbs = getRandomItems(koreanProverbs, 10);
@@ -125,7 +135,7 @@ export const useGameLogic = () => {
       const shuffledRiddles = getRandomItems(riddles, 10);
       setRiddleProblems(shuffledRiddles);
     } else {
-      const newProblems = generateMathProblems(gameMode);
+      const newProblems = generateMathProblems(gameMode as 'addition' | 'multiplication' | 'division');
       setProblems(newProblems);
     }
   }, [gameMode]);
@@ -143,6 +153,9 @@ export const useGameLogic = () => {
             
             if (gameMode === 'english') {
               const correctAnswer = wordProblems[currentProblem]?.english?.toLowerCase() || '';
+              correct = currentUserAnswer.toLowerCase() === correctAnswer;
+            } else if (gameMode === 'english2') {
+              const correctAnswer = wordProblems2[currentProblem]?.english?.toLowerCase() || '';
               correct = currentUserAnswer.toLowerCase() === correctAnswer;
             } else if (gameMode === 'proverb') {
               const currentProverbProblem = proverbProblems[currentProblem];
@@ -168,6 +181,7 @@ export const useGameLogic = () => {
             
             setTimeout(() => {
               const problemsLength = gameMode === 'english' ? wordProblems.length : 
+                                   gameMode === 'english2' ? wordProblems2.length : 
                                    gameMode === 'proverb' ? proverbProblems.length : 
                                    gameMode === 'country' ? countryProblems.length : 
                                    gameMode === 'historical' ? historicalProblems.length :
@@ -192,7 +206,7 @@ export const useGameLogic = () => {
         clearInterval(timer);
       };
     }
-  }, [currentProblem, gameMode, showResult, gameComplete, problems.length, wordProblems.length, proverbProblems.length, countryProblems.length, historicalProblems.length, riddleProblems.length]);
+  }, [currentProblem, gameMode, showResult, gameComplete, problems.length, wordProblems.length, wordProblems2.length, proverbProblems.length, countryProblems.length, historicalProblems.length, riddleProblems.length]);
 
   // 답안 제출 함수
   const handleSubmit = () => {
@@ -207,6 +221,9 @@ export const useGameLogic = () => {
     
     if (gameMode === 'english') {
       const correctAnswer = wordProblems[currentProblem].english.toLowerCase();
+      correct = userAnswer.toLowerCase() === correctAnswer;
+    } else if (gameMode === 'english2') {
+      const correctAnswer = wordProblems2[currentProblem].english.toLowerCase();
       correct = userAnswer.toLowerCase() === correctAnswer;
     } else if (gameMode === 'proverb') {
       const currentProverbProblem = proverbProblems[currentProblem];
@@ -235,6 +252,7 @@ export const useGameLogic = () => {
     }
 
     const problemsLength = gameMode === 'english' ? wordProblems.length : 
+                           gameMode === 'english2' ? wordProblems2.length : 
                            gameMode === 'proverb' ? proverbProblems.length : 
                            gameMode === 'country' ? countryProblems.length : 
                            gameMode === 'historical' ? historicalProblems.length :
@@ -258,12 +276,12 @@ export const useGameLogic = () => {
     setUserAnswer(choice);
   };
 
-  // 힌트 함수
+  // 힘트 함수
   const handleHint = () => {
     if (gameMode === 'english' && wordProblems.length > 0) {
-      const correctAnswer = wordProblems[currentProblem].english;
-      const nextHintLevel = Math.min(hintLevel + 1, correctAnswer.length);
-      setHintLevel(nextHintLevel);
+      setHintLevel(prev => Math.min(prev + 1, wordProblems[currentProblem]?.english.length || 0));
+    } else if (gameMode === 'english2' && wordProblems2.length > 0) {
+      setHintLevel(prev => Math.min(prev + 1, wordProblems2[currentProblem]?.english.length || 0));
     } else if (gameMode === 'proverb' && proverbProblems.length > 0) {
       const currentProverbProblem = proverbProblems[currentProblem];
       const correctAnswer = currentProverbProblem.isFirstHalf ? currentProverbProblem.second : currentProverbProblem.first;
@@ -289,6 +307,7 @@ export const useGameLogic = () => {
     gameMode,
     problems,
     wordProblems,
+    wordProblems2,
     proverbProblems,
     countryProblems,
     historicalProblems,
@@ -312,8 +331,9 @@ export const useGameLogic = () => {
     handleChoiceSelect,
     
     // Utils
-    isLoading: (gameMode !== 'english' && gameMode !== 'proverb' && gameMode !== 'country' && gameMode !== 'historical' && gameMode !== 'riddle' && problems.length === 0) || 
+    isLoading: (gameMode !== 'english' && gameMode !== 'english2' && gameMode !== 'proverb' && gameMode !== 'country' && gameMode !== 'historical' && gameMode !== 'riddle' && problems.length === 0) || 
                (gameMode === 'english' && wordProblems.length === 0) ||
+               (gameMode === 'english2' && wordProblems2.length === 0) ||
                (gameMode === 'proverb' && proverbProblems.length === 0) ||
                (gameMode === 'country' && countryProblems.length === 0) ||
                (gameMode === 'historical' && historicalProblems.length === 0) ||

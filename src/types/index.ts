@@ -36,4 +36,4 @@ export interface RiddleProblem {
   hint?: string;
 }
 
-export type GameMode = 'menu' | 'addition' | 'multiplication' | 'english' | 'proverb' | 'country' | 'historical' | 'riddle';
+export type GameMode = 'menu' | 'addition' | 'multiplication' | 'division' | 'english' | 'english2' | 'proverb' | 'country' | 'historical' | 'riddle';

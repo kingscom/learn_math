@@ -1,7 +1,7 @@
 import { Problem } from '../types';
 
 // 수학 문제 생성 함수
-export const generateMathProblems = (gameMode: 'addition' | 'multiplication'): Problem[] => {
+export const generateMathProblems = (gameMode: 'addition' | 'multiplication' | 'division'): Problem[] => {
   const problems: Problem[] = [];
   
   for (let i = 0; i < 10; i++) {
@@ -22,6 +22,16 @@ export const generateMathProblems = (gameMode: 'addition' | 'multiplication'): P
         num1,
         num2,
         answer: num1 * num2
+      });
+    } else if (gameMode === 'division') {
+      // 나누어 떨어지는 나누기 문제 (나머지 0)
+      const divisor = Math.floor(Math.random() * 8) + 2; // 2~9
+      const quotient = Math.floor(Math.random() * 9) + 2; // 2~10
+      const dividend = divisor * quotient; // 나누어 떨어지도록
+      problems.push({
+        num1: dividend,
+        num2: divisor,
+        answer: quotient
       });
     }
   }
