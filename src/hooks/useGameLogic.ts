@@ -3,6 +3,7 @@ import { GameMode, Problem, WordProblem, ProverbProblem, CountryProblem, Histori
 import { englishWords } from '../data/englishWords';
 import { englishWords2 } from '../data/englishWords2';
 import { hayoungWords } from '../data/hayoungWords';
+import { harangWords } from '../data/harangWords';
 import { koreanProverbs } from '../data/koreanProverbs';
 import { countries } from '../data/countries';
 import { historicalFigures } from '../data/historicalFigures';
@@ -16,6 +17,8 @@ export const useGameLogic = () => {
   const [wordProblems2, setWordProblems2] = useState<WordProblem[]>([]);
   const [hayoungProblems, setHayoungProblems] = useState<WordProblem[]>([]);
   const [hayoungResults, setHayoungResults] = useState<boolean[]>([]);
+  const [harangProblems, setHarangProblems] = useState<string[]>([]);
+  const [harangResults, setHarangResults] = useState<boolean[]>([]);
   const [proverbProblems, setProverbProblems] = useState<ProverbProblem[]>([]);
   const [countryProblems, setCountryProblems] = useState<CountryProblem[]>([]);
   const [historicalProblems, setHistoricalProblems] = useState<HistoricalFigureProblem[]>([]);
@@ -142,15 +145,20 @@ export const useGameLogic = () => {
       const shuffled = shuffleArray(hayoungWords);
       setHayoungProblems(shuffled);
       setHayoungResults(new Array(shuffled.length).fill(false));
+    } else if (gameMode === 'harang') {
+      // 모든 단어를 랜덤으로 섞어서 사용
+      const shuffled = shuffleArray(harangWords);
+      setHarangProblems(shuffled);
+      setHarangResults(new Array(shuffled.length).fill(false));
     } else {
       const newProblems = generateMathProblems(gameMode as 'addition' | 'multiplication' | 'division');
       setProblems(newProblems);
     }
   }, [gameMode]);
 
-  // 타이머 useEffect (수수께끼, 하영이영어 제외한 모든 게임 모드에 적용)
+  // 타이머 useEffect (수수께끼, 하영이영어, 하랑이영어 제외한 모든 게임 모드에 적용)
   useEffect(() => {
-    if (gameMode !== 'menu' && gameMode !== 'riddle' && gameMode !== 'hayoung' && !showResult && !gameComplete) {
+    if (gameMode !== 'menu' && gameMode !== 'riddle' && gameMode !== 'hayoung' && gameMode !== 'harang' && !showResult && !gameComplete) {
       setTimeLeft(5);
       const timer = setInterval(() => {
         setTimeLeft(prev => {
@@ -250,6 +258,9 @@ export const useGameLogic = () => {
     } else if (gameMode === 'hayoung') {
       const correctAnswer = hayoungProblems[currentProblem].english.toLowerCase();
       correct = userAnswer.toLowerCase().trim() === correctAnswer;
+    } else if (gameMode === 'harang') {
+      const correctAnswer = harangProblems[currentProblem].toLowerCase();
+      correct = userAnswer.toLowerCase().trim() === correctAnswer;
     } else {
       const userNum = parseInt(userAnswer);
       correct = userNum === problems[currentProblem].answer;
@@ -269,6 +280,13 @@ export const useGameLogic = () => {
       setHayoungResults(newResults);
     }
 
+    // harang 게임의 경우 결과를 배열에 저장
+    if (gameMode === 'harang') {
+      const newResults = [...harangResults];
+      newResults[currentProblem] = correct;
+      setHarangResults(newResults);
+    }
+
     const problemsLength = gameMode === 'english' ? wordProblems.length : 
                            gameMode === 'english2' ? wordProblems2.length : 
                            gameMode === 'proverb' ? proverbProblems.length : 
@@ -276,23 +294,48 @@ export const useGameLogic = () => {
                            gameMode === 'historical' ? historicalProblems.length :
                            gameMode === 'riddle' ? riddleProblems.length :
                            gameMode === 'hayoung' ? hayoungProblems.length :
+                           gameMode === 'harang' ? harangProblems.length :
                            problems.length;
     
-    setTimeout(() => {
-      if (currentProblem < problemsLength - 1) {
-        setCurrentProblem(prev => prev + 1);
-        setUserAnswer('');
-        setShowResult(false);
-        setHintLevel(0);
-      } else {
-        setGameComplete(true);
+    // 하영이 영어 게임은 수동으로 다음 문제로 넘어가므로 자동 넘김 제외
+    if (gameMode !== 'hayoung') {
+      setTimeout(() => {
+        if (currentProblem < problemsLength - 1) {
+          setCurrentProblem(prev => prev + 1);
+          setUserAnswer('');
+          setShowResult(false);
+          setHintLevel(0);
+        } else {
+          setGameComplete(true);
+        }
+      }, 1500);
+    } else {
+      // 하영이 영어는 마지막 문제인지만 체크
+      if (currentProblem >= problemsLength - 1) {
+        setTimeout(() => {
+          setGameComplete(true);
+        }, 100);
       }
-    }, 1500);
+    }
   };
 
   // 4지선다 선택 함수
   const handleChoiceSelect = (choice: string) => {
     setUserAnswer(choice);
+  };
+
+  // 하영이 영어 - 다음 문제로 이동
+  const handleNextProblem = () => {
+    const problemsLength = gameMode === 'hayoung' ? hayoungProblems.length : 0;
+    
+    if (currentProblem < problemsLength - 1) {
+      setCurrentProblem(prev => prev + 1);
+      setUserAnswer('');
+      setShowResult(false);
+      setHintLevel(0);
+    } else {
+      setGameComplete(true);
+    }
   };
 
   // 힘트 함수
@@ -333,6 +376,8 @@ export const useGameLogic = () => {
     riddleProblems,
     hayoungProblems,
     hayoungResults,
+    harangProblems,
+    harangResults,
     isFirstHalf,
     currentProblem,
     userAnswer,
@@ -350,15 +395,17 @@ export const useGameLogic = () => {
     handleSubmit,
     handleHint,
     handleChoiceSelect,
+    handleNextProblem,
     
     // Utils
-    isLoading: (gameMode !== 'english' && gameMode !== 'english2' && gameMode !== 'proverb' && gameMode !== 'country' && gameMode !== 'historical' && gameMode !== 'riddle' && gameMode !== 'hayoung' && problems.length === 0) || 
+    isLoading: (gameMode !== 'english' && gameMode !== 'english2' && gameMode !== 'proverb' && gameMode !== 'country' && gameMode !== 'historical' && gameMode !== 'riddle' && gameMode !== 'hayoung' && gameMode !== 'harang' && problems.length === 0) || 
                (gameMode === 'english' && wordProblems.length === 0) ||
                (gameMode === 'english2' && wordProblems2.length === 0) ||
                (gameMode === 'proverb' && proverbProblems.length === 0) ||
                (gameMode === 'country' && countryProblems.length === 0) ||
                (gameMode === 'historical' && historicalProblems.length === 0) ||
                (gameMode === 'riddle' && riddleProblems.length === 0) ||
-               (gameMode === 'hayoung' && hayoungProblems.length === 0)
+               (gameMode === 'hayoung' && hayoungProblems.length === 0) ||
+               (gameMode === 'harang' && harangProblems.length === 0)
   };
 };

@@ -8,9 +8,11 @@ interface GameCompleteProps {
   onRetry: () => void;
   hayoungProblems?: WordProblem[];
   hayoungResults?: boolean[];
+  harangProblems?: string[];
+  harangResults?: boolean[];
 }
 
-export default function GameComplete({ score, gameMode, onRestart, onRetry, hayoungProblems, hayoungResults }: GameCompleteProps) {
+export default function GameComplete({ score, gameMode, onRestart, onRetry, hayoungProblems, hayoungResults, harangProblems, harangResults }: GameCompleteProps) {
   const getGameTitle = () => {
     switch (gameMode) {
       case 'addition': return '덧셈';
@@ -23,11 +25,12 @@ export default function GameComplete({ score, gameMode, onRestart, onRetry, hayo
       case 'historical': return '위인 퀴즈';
       case 'riddle': return '수수께끼';
       case 'hayoung': return '하영이 영어';
+      case 'harang': return '하랑이 영어';
       default: return '게임';
     }
   };
 
-  const totalProblems = gameMode === 'hayoung' ? (hayoungProblems?.length || 0) : 10;
+  const totalProblems = gameMode === 'hayoung' ? (hayoungProblems?.length || 0) : gameMode === 'harang' ? (harangProblems?.length || 0) : 10;
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-100 to-purple-100 p-4">
@@ -51,6 +54,23 @@ export default function GameComplete({ score, gameMode, onRestart, onRetry, hayo
                   <span className="text-left flex-1 font-mono">{problem.english}</span>
                   <span className="text-xl ml-2">
                     {hayoungResults[index] ? '✅' : '❌'}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* 하랑이 영어 게임 상세 결과 */}
+        {gameMode === 'harang' && harangProblems && harangResults && (
+          <div className="mb-6 max-h-60 overflow-y-auto bg-gray-50 rounded-lg p-4">
+            <h3 className="text-lg font-bold mb-3">문제별 결과</h3>
+            <div className="space-y-2 text-sm">
+              {harangProblems.map((word, index) => (
+                <div key={index} className="flex justify-between items-center p-2 bg-white rounded">
+                  <span className="text-left flex-1 font-mono text-lg">{word}</span>
+                  <span className="text-xl ml-2">
+                    {harangResults[index] ? '✅' : '❌'}
                   </span>
                 </div>
               ))}

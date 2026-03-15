@@ -1,7 +1,7 @@
 import { GameMode } from '../types';
 
 interface GameMenuProps {
-  onStartGame: (mode: 'addition' | 'multiplication' | 'division' | 'english' | 'english2' | 'proverb' | 'country' | 'historical' | 'riddle' | 'hayoung') => void;
+  onStartGame: (mode: 'addition' | 'multiplication' | 'division' | 'english' | 'english2' | 'proverb' | 'country' | 'historical' | 'riddle' | 'hayoung' | 'harang') => void;
 }
 
 export default function GameMenu({ onStartGame }: GameMenuProps) {
@@ -100,6 +100,15 @@ export default function GameMenu({ onStartGame }: GameMenuProps) {
             <div className="text-3xl mb-2">🎓</div>
             <div>하영이 영어</div>
             <div className="text-sm opacity-80">직접 입력 방식</div>
+          </button>
+
+          <button
+            onClick={() => onStartGame('harang')}
+            className="w-full bg-violet-500 hover:bg-violet-600 text-white font-bold py-6 px-8 rounded-xl text-xl transition-colors shadow-lg"
+          >
+            <div className="text-3xl mb-2">🎧</div>
+            <div>하랑이 영어</div>
+            <div className="text-sm opacity-80">발음으로 학습</div>
           </button>
         </div>
       </div>
