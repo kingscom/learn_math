@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useGameLogic } from '../hooks/useGameLogic';
 import { handleKoreanInput, handleKoreanBackspace, addSpace } from '../utils/hangulUtils';
-import { speakEnglish, speakEnglishSlow } from '../utils/speechUtils';
+import { speakEnglish, speakEnglishSlow, playCorrectSound, playWrongSound } from '../utils/speechUtils';
 
 import GameMenu from '../components/GameMenu';
 import GameComplete from '../components/GameComplete';
@@ -80,11 +80,23 @@ export default function Home() {
   const handleHayoungSubmit = () => {
     if (userAnswer === '') return;
     
+    // 정답 체크
+    const correctAnswer = hayoungProblems[currentProblem].english;
+    const isAnswerCorrect = userAnswer.toLowerCase().trim() === correctAnswer.toLowerCase().trim();
+    
+    // 정답/오답 사운드 재생
+    if (isAnswerCorrect) {
+      playCorrectSound();
+    } else {
+      playWrongSound();
+    }
+    
     handleSubmit();
     
-    // 정답 발음을 3번 재생
-    const correctAnswer = hayoungProblems[currentProblem].english;
-    speakEnglish(correctAnswer, 3);
+    // 정답 발음을 3번 재생 (약간의 딜레이 후)
+    setTimeout(() => {
+      speakEnglish(correctAnswer, 3);
+    }, 500);
   };
 
   // 하영이 영어 - 다음 문제로 이동

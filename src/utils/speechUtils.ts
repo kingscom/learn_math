@@ -58,3 +58,57 @@ export const stopSpeaking = (): void => {
     window.speechSynthesis.cancel();
   }
 };
+
+// 정답 사운드 재생 (딩동댕)
+export const playCorrectSound = (): void => {
+  try {
+    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const notes = [523.25, 659.25, 783.99]; // 도, 미, 솔
+    let startTime = audioContext.currentTime;
+
+    notes.forEach((frequency, index) => {
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+
+      oscillator.frequency.value = frequency;
+      oscillator.type = 'sine';
+
+      gainNode.gain.setValueAtTime(0.3, startTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + 0.3);
+
+      oscillator.start(startTime);
+      oscillator.stop(startTime + 0.3);
+
+      startTime += 0.15;
+    });
+  } catch (error) {
+    console.log('Sound playback not supported');
+  }
+};
+
+// 오답 사운드 재생 (땡)
+export const playWrongSound = (): void => {
+  try {
+    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+
+    oscillator.frequency.value = 200; // 낮은 부저음
+    oscillator.type = 'sawtooth';
+
+    const startTime = audioContext.currentTime;
+    gainNode.gain.setValueAtTime(0.3, startTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + 0.5);
+
+    oscillator.start(startTime);
+    oscillator.stop(startTime + 0.5);
+  } catch (error) {
+    console.log('Sound playback not supported');
+  }
+};
