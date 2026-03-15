@@ -33,7 +33,7 @@ export const speakEnglishSlow = (text: string, times: number = 1): void => {
     const speak = () => {
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = 'en-US';
-      utterance.rate = 0.3; // 엄청 느리게
+      utterance.rate = 0.5; // 엄청 느리게
       utterance.pitch = 1.0;
       utterance.volume = 1.0;
       
