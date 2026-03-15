@@ -36,7 +36,7 @@ export default function EnglishKeyboard({
           ))}
         </div>
         
-        {/* 두 번째 줄 - 9개 버튼 */}
+        {/* 두 번째 줄 - 9개 버튼 + ' */}
         <div className="flex gap-1 lg:gap-2">
           <div className="flex-1"></div>
           {['a','s','d','f','g','h','j','k','l'].map(letter => (
@@ -49,6 +49,14 @@ export default function EnglishKeyboard({
               {letter}
             </button>
           ))}
+          {/* 작은따옴표 버튼 */}
+          <button
+            onClick={() => onLetterClick("'")}
+            disabled={showResult}
+            className="bg-white hover:bg-gray-100 disabled:bg-gray-300 text-black font-bold py-3 px-1 lg:py-4 lg:px-4 rounded-lg text-base lg:text-2xl transition-colors flex-1 shadow-md border border-gray-200"
+          >
+            '
+          </button>
           <div className="flex-1"></div>
         </div>
         

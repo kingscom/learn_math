@@ -7,11 +7,11 @@ interface GameMenuProps {
 export default function GameMenu({ onStartGame }: GameMenuProps) {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-100 to-purple-100">
-      <div className="text-center p-8 bg-white rounded-3xl shadow-2xl max-w-2xl mx-4">
+      <div className="text-center p-8 bg-white rounded-3xl shadow-2xl max-w-6xl mx-4">
         <h1 className="text-5xl font-bold text-gray-800 mb-8">🎮 하영하랑 게임</h1>
         <p className="text-lg text-gray-600 mb-12">재미있게 배워보세요!</p>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <button
             onClick={() => onStartGame('addition')}
             className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-6 px-8 rounded-xl text-xl transition-colors shadow-lg"
@@ -86,7 +86,7 @@ export default function GameMenu({ onStartGame }: GameMenuProps) {
 
           <button
             onClick={() => onStartGame('riddle')}
-            className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-6 px-8 rounded-xl text-xl transition-colors shadow-lg md:col-span-2 lg:col-span-1"
+            className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-6 px-8 rounded-xl text-xl transition-colors shadow-lg"
           >
             <div className="text-3xl mb-2">🧩</div>
             <div>수수께끼</div>
@@ -95,7 +95,7 @@ export default function GameMenu({ onStartGame }: GameMenuProps) {
 
           <button
             onClick={() => onStartGame('hayoung')}
-            className="w-full bg-rose-500 hover:bg-rose-600 text-white font-bold py-6 px-8 rounded-xl text-xl transition-colors shadow-lg md:col-span-2 lg:col-span-1"
+            className="w-full bg-rose-500 hover:bg-rose-600 text-white font-bold py-6 px-8 rounded-xl text-xl transition-colors shadow-lg"
           >
             <div className="text-3xl mb-2">🎓</div>
             <div>하영이 영어</div>
