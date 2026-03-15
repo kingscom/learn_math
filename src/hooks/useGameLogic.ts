@@ -2,17 +2,20 @@ import { useState, useEffect, useRef } from 'react';
 import { GameMode, Problem, WordProblem, ProverbProblem, CountryProblem, HistoricalFigureProblem, RiddleProblem } from '../types';
 import { englishWords } from '../data/englishWords';
 import { englishWords2 } from '../data/englishWords2';
+import { hayoungWords } from '../data/hayoungWords';
 import { koreanProverbs } from '../data/koreanProverbs';
 import { countries } from '../data/countries';
 import { historicalFigures } from '../data/historicalFigures';
 import { riddles } from '../data/riddles';
-import { generateMathProblems, getRandomItems, generateChoices } from '../utils/gameUtils';
+import { generateMathProblems, getRandomItems, generateChoices, shuffleArray } from '../utils/gameUtils';
 
 export const useGameLogic = () => {
   const [gameMode, setGameMode] = useState<GameMode>('menu');
   const [problems, setProblems] = useState<Problem[]>([]);
   const [wordProblems, setWordProblems] = useState<WordProblem[]>([]);
   const [wordProblems2, setWordProblems2] = useState<WordProblem[]>([]);
+  const [hayoungProblems, setHayoungProblems] = useState<WordProblem[]>([]);
+  const [hayoungResults, setHayoungResults] = useState<boolean[]>([]);
   const [proverbProblems, setProverbProblems] = useState<ProverbProblem[]>([]);
   const [countryProblems, setCountryProblems] = useState<CountryProblem[]>([]);
   const [historicalProblems, setHistoricalProblems] = useState<HistoricalFigureProblem[]>([]);
@@ -134,15 +137,20 @@ export const useGameLogic = () => {
     } else if (gameMode === 'riddle') {
       const shuffledRiddles = getRandomItems(riddles, 10);
       setRiddleProblems(shuffledRiddles);
+    } else if (gameMode === 'hayoung') {
+      // 모든 단어를 랜덤으로 섞어서 사용
+      const shuffled = shuffleArray(hayoungWords);
+      setHayoungProblems(shuffled);
+      setHayoungResults(new Array(shuffled.length).fill(false));
     } else {
       const newProblems = generateMathProblems(gameMode as 'addition' | 'multiplication' | 'division');
       setProblems(newProblems);
     }
   }, [gameMode]);
 
-  // 타이머 useEffect (수수께끼 제외한 모든 게임 모드에 적용)
+  // 타이머 useEffect (수수께끼, 하영이영어 제외한 모든 게임 모드에 적용)
   useEffect(() => {
-    if (gameMode !== 'menu' && gameMode !== 'riddle' && !showResult && !gameComplete) {
+    if (gameMode !== 'menu' && gameMode !== 'riddle' && gameMode !== 'hayoung' && !showResult && !gameComplete) {
       setTimeLeft(5);
       const timer = setInterval(() => {
         setTimeLeft(prev => {
@@ -239,6 +247,9 @@ export const useGameLogic = () => {
     } else if (gameMode === 'riddle') {
       const correctAnswer = riddleProblems[currentProblem].answer;
       correct = userAnswer.trim() === correctAnswer;
+    } else if (gameMode === 'hayoung') {
+      const correctAnswer = hayoungProblems[currentProblem].english.toLowerCase();
+      correct = userAnswer.toLowerCase().trim() === correctAnswer;
     } else {
       const userNum = parseInt(userAnswer);
       correct = userNum === problems[currentProblem].answer;
@@ -251,12 +262,20 @@ export const useGameLogic = () => {
       setScore(prev => prev + 1);
     }
 
+    // hayoung 게임의 경우 결과를 배열에 저장
+    if (gameMode === 'hayoung') {
+      const newResults = [...hayoungResults];
+      newResults[currentProblem] = correct;
+      setHayoungResults(newResults);
+    }
+
     const problemsLength = gameMode === 'english' ? wordProblems.length : 
                            gameMode === 'english2' ? wordProblems2.length : 
                            gameMode === 'proverb' ? proverbProblems.length : 
                            gameMode === 'country' ? countryProblems.length : 
                            gameMode === 'historical' ? historicalProblems.length :
                            gameMode === 'riddle' ? riddleProblems.length :
+                           gameMode === 'hayoung' ? hayoungProblems.length :
                            problems.length;
     
     setTimeout(() => {
@@ -312,6 +331,8 @@ export const useGameLogic = () => {
     countryProblems,
     historicalProblems,
     riddleProblems,
+    hayoungProblems,
+    hayoungResults,
     isFirstHalf,
     currentProblem,
     userAnswer,
@@ -331,12 +352,13 @@ export const useGameLogic = () => {
     handleChoiceSelect,
     
     // Utils
-    isLoading: (gameMode !== 'english' && gameMode !== 'english2' && gameMode !== 'proverb' && gameMode !== 'country' && gameMode !== 'historical' && gameMode !== 'riddle' && problems.length === 0) || 
+    isLoading: (gameMode !== 'english' && gameMode !== 'english2' && gameMode !== 'proverb' && gameMode !== 'country' && gameMode !== 'historical' && gameMode !== 'riddle' && gameMode !== 'hayoung' && problems.length === 0) || 
                (gameMode === 'english' && wordProblems.length === 0) ||
                (gameMode === 'english2' && wordProblems2.length === 0) ||
                (gameMode === 'proverb' && proverbProblems.length === 0) ||
                (gameMode === 'country' && countryProblems.length === 0) ||
                (gameMode === 'historical' && historicalProblems.length === 0) ||
-               (gameMode === 'riddle' && riddleProblems.length === 0)
+               (gameMode === 'riddle' && riddleProblems.length === 0) ||
+               (gameMode === 'hayoung' && hayoungProblems.length === 0)
   };
 };

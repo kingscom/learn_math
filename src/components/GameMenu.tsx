@@ -1,7 +1,7 @@
 import { GameMode } from '../types';
 
 interface GameMenuProps {
-  onStartGame: (mode: 'addition' | 'multiplication' | 'division' | 'english' | 'english2' | 'proverb' | 'country' | 'historical' | 'riddle') => void;
+  onStartGame: (mode: 'addition' | 'multiplication' | 'division' | 'english' | 'english2' | 'proverb' | 'country' | 'historical' | 'riddle' | 'hayoung') => void;
 }
 
 export default function GameMenu({ onStartGame }: GameMenuProps) {
@@ -91,6 +91,15 @@ export default function GameMenu({ onStartGame }: GameMenuProps) {
             <div className="text-3xl mb-2">🧩</div>
             <div>수수께끼</div>
             <div className="text-sm opacity-80">시간 제한 없음</div>
+          </button>
+
+          <button
+            onClick={() => onStartGame('hayoung')}
+            className="w-full bg-rose-500 hover:bg-rose-600 text-white font-bold py-6 px-8 rounded-xl text-xl transition-colors shadow-lg md:col-span-2 lg:col-span-1"
+          >
+            <div className="text-3xl mb-2">🎓</div>
+            <div>하영이 영어</div>
+            <div className="text-sm opacity-80">직접 입력 방식</div>
           </button>
         </div>
       </div>

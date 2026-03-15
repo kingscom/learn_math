@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useGameLogic } from '../hooks/useGameLogic';
 import { handleKoreanInput, handleKoreanBackspace, addSpace } from '../utils/hangulUtils';
+import { speakEnglish } from '../utils/speechUtils';
 
 import GameMenu from '../components/GameMenu';
 import GameComplete from '../components/GameComplete';
@@ -21,6 +22,8 @@ export default function Home() {
     countryProblems,
     historicalProblems,
     riddleProblems,
+    hayoungProblems,
+    hayoungResults,
     isFirstHalf,
     currentProblem,
     userAnswer,
@@ -70,6 +73,24 @@ export default function Home() {
     }
   };
 
+  // 하영이 영어 전용 제출 핸들러
+  const handleHayoungSubmit = () => {
+    if (userAnswer === '') return;
+    
+    handleSubmit();
+    
+    // 정답 발음을 2번 재생
+    const correctAnswer = hayoungProblems[currentProblem].english;
+    speakEnglish(correctAnswer, 2);
+    
+    // 발음이 끝난 후 다음 문제로 (약 3초 후)
+    setTimeout(() => {
+      if (currentProblem < hayoungProblems.length - 1) {
+        setUserAnswer('');
+      }
+    }, 3000);
+  };
+
   // 메뉴 화면
   if (gameMode === 'menu') {
     return <GameMenu onStartGame={startGame} />;
@@ -88,6 +109,8 @@ export default function Home() {
         gameMode={gameMode}
         onRestart={restartGame}
         onRetry={() => startGame(gameMode as any)}
+        hayoungProblems={hayoungProblems}
+        hayoungResults={hayoungResults}
       />
     );
   }
@@ -104,24 +127,24 @@ export default function Home() {
           >
             🏠 메뉴
           </button>
-          <div className="text-xl lg:text-2xl font-bold text-gray-800">점수: {score}/10</div>
+          <div className="text-xl lg:text-2xl font-bold text-gray-800">점수: {score}/{gameMode === 'hayoung' ? hayoungProblems.length : 10}</div>
         </div>
 
         {/* 타이머와 진행률을 가로로 배치 */}
         <div className="flex justify-between items-center mb-3 lg:mb-4 gap-4 lg:gap-8">
           {/* 진행률 */}
           <div className="flex-1">
-            <div className="text-base lg:text-lg text-gray-600 mb-1 lg:mb-2">문제 {currentProblem + 1}/10</div>
+            <div className="text-base lg:text-lg text-gray-600 mb-1 lg:mb-2">문제 {currentProblem + 1}/{gameMode === 'hayoung' ? hayoungProblems.length : 10}</div>
             <div className="w-full bg-gray-200 rounded-full h-2 lg:h-3">
               <div 
                 className="bg-blue-500 h-2 lg:h-3 rounded-full transition-all"
-                style={{ width: `${((currentProblem + 1) / 10) * 100}%` }}
+                style={{ width: `${((currentProblem + 1) / (gameMode === 'hayoung' ? hayoungProblems.length : 10)) * 100}%` }}
               ></div>
             </div>
           </div>
 
-          {/* 타이머 (수수께끼 제외) */}
-          {gameMode !== 'riddle' && (
+          {/* 타이머 (수수께끼, 하영이영어 제외) */}
+          {gameMode !== 'riddle' && gameMode !== 'hayoung' && (
             <div className="flex-1">
               <div className="text-lg lg:text-xl font-bold text-red-600 mb-1 lg:mb-2">⏰ {timeLeft}초</div>
               <div className="w-full bg-gray-200 rounded-full h-2 lg:h-3">
@@ -242,6 +265,18 @@ export default function Home() {
                   </div>
                 )}
               </div>
+            ) : gameMode === 'hayoung' ? (
+              <div className="text-center">
+                <div className="text-3xl lg:text-5xl font-bold text-gray-800 mb-6 lg:mb-8">
+                  🎓 하영이 영어
+                </div>
+                <div className="text-3xl lg:text-5xl font-bold text-rose-600 mb-6 lg:mb-8">
+                  {hayoungProblems[currentProblem]?.korean}
+                </div>
+                <div className="text-lg lg:text-xl text-gray-600 mb-4">
+                  영어로 입력하세요
+                </div>
+              </div>
             ) : (
               <div className="text-center">
                 <div className="text-4xl lg:text-6xl font-bold text-gray-800 mb-4 lg:mb-6">
@@ -251,7 +286,7 @@ export default function Home() {
             )}
             
             {/* 답안 입력 표시 */}
-            {(gameMode === 'addition' || gameMode === 'multiplication' || gameMode === 'division' || gameMode === 'riddle') ? (
+            {(gameMode === 'addition' || gameMode === 'multiplication' || gameMode === 'division' || gameMode === 'riddle' || gameMode === 'hayoung') ? (
               <div className="text-2xl lg:text-4xl font-bold mb-4 lg:mb-6 min-h-12 lg:min-h-16 flex items-center border-2 border-gray-300 relative bg-white rounded-lg px-4 py-2 mx-auto max-w-xs lg:max-w-lg shadow-inner overflow-hidden">
                 <div className="flex items-center w-full">
                   {userAnswer ? (
@@ -293,10 +328,12 @@ export default function Home() {
                     <span className="text-center text-lg lg:text-xl">
                       {timeLeft === 0 ? '시간 초과!' : ''} 정답은 {
                         gameMode === 'english' ? wordProblems[currentProblem]?.english :
+                        gameMode === 'english2' ? wordProblems2[currentProblem]?.english :
                         gameMode === 'proverb' ? (proverbProblems[currentProblem]?.isFirstHalf ? proverbProblems[currentProblem]?.second : proverbProblems[currentProblem]?.first) :
                         gameMode === 'country' ? (countryProblems[currentProblem]?.askCountry ? countryProblems[currentProblem]?.country : countryProblems[currentProblem]?.capital) :
                         gameMode === 'historical' ? historicalProblems[currentProblem]?.answer :
                         gameMode === 'riddle' ? riddleProblems[currentProblem]?.answer :
+                        gameMode === 'hayoung' ? hayoungProblems[currentProblem]?.english :
                         problems[currentProblem]?.answer
                       }이에요
                     </span>
@@ -363,6 +400,15 @@ export default function Home() {
                 showResult={showResult}
                 userAnswer={userAnswer}
                 canHint={hintLevel === 0}
+              />
+            ) : gameMode === 'hayoung' ? (
+              <EnglishKeyboard
+                onLetterClick={handleLetterClick}
+                onSpace={handleSpace}
+                onClear={handleClear}
+                onSubmit={handleHayoungSubmit}
+                showResult={showResult}
+                userAnswer={userAnswer}
               />
             ) : (
               <NumberKeypad

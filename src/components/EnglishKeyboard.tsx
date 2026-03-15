@@ -1,21 +1,23 @@
 interface EnglishKeyboardProps {
   onLetterClick: (letter: string) => void;
   onClear: () => void;
-  onHint: () => void;
+  onHint?: () => void;
+  onSpace?: () => void;
   onSubmit: () => void;
   showResult: boolean;
   userAnswer: string;
-  canHint: boolean;
+  canHint?: boolean;
 }
 
 export default function EnglishKeyboard({
   onLetterClick,
   onClear,
   onHint,
+  onSpace,
   onSubmit,
   showResult,
   userAnswer,
-  canHint
+  canHint = false
 }: EnglishKeyboardProps) {
   return (
     <div className="w-full max-w-full px-2 lg:px-0">
@@ -78,20 +80,33 @@ export default function EnglishKeyboard({
       
       {/* 네 번째 줄 - 하단 기능 버튼들 */}
       <div className="flex gap-1 lg:gap-2">
-        <button
-          onClick={onHint}
-          disabled={showResult || !canHint}
-          className="bg-orange-500 hover:bg-orange-600 disabled:bg-gray-300 text-white font-bold py-3 px-3 lg:py-4 lg:px-4 rounded-lg text-sm lg:text-lg transition-colors shadow-md border border-gray-200"
-          style={{ flex: '2' }}
-        >
-          힌트
-        </button>
+        {onHint && (
+          <button
+            onClick={onHint}
+            disabled={showResult || !canHint}
+            className="bg-orange-500 hover:bg-orange-600 disabled:bg-gray-300 text-white font-bold py-3 px-3 lg:py-4 lg:px-4 rounded-lg text-sm lg:text-lg transition-colors shadow-md border border-gray-200"
+            style={{ flex: '1.5' }}
+          >
+            힙트
+          </button>
+        )}
+        
+        {onSpace && (
+          <button
+            onClick={onSpace}
+            disabled={showResult}
+            className="bg-white hover:bg-gray-100 disabled:bg-gray-300 text-black font-bold py-3 px-2 lg:py-4 lg:px-4 rounded-lg text-lg lg:text-lg transition-colors shadow-md border border-gray-200"
+            style={{ flex: '3' }}
+          >
+            <span>─</span>
+          </button>
+        )}
         
         <button
           onClick={onSubmit}
           disabled={showResult || userAnswer === ''}
           className="bg-gray-400 hover:bg-gray-500 disabled:bg-gray-300 text-white font-bold py-3 px-3 lg:py-4 lg:px-4 rounded-lg text-sm lg:text-lg transition-colors shadow-md border border-gray-200"
-          style={{ flex: '2' }}
+          style={{ flex: '1.5' }}
         >
           확인
         </button>
