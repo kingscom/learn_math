@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 interface EnglishKeyboardProps {
   onLetterClick: (letter: string) => void;
   onClear: () => void;
@@ -19,6 +21,17 @@ export default function EnglishKeyboard({
   userAnswer,
   canHint = false
 }: EnglishKeyboardProps) {
+  const [isShiftActive, setIsShiftActive] = useState(false);
+
+  const handleLetterClick = (letter: string) => {
+    const finalLetter = isShiftActive ? letter.toUpperCase() : letter;
+    onLetterClick(finalLetter);
+    // Shift를 한 번 누르면 한 글자만 대문자로 입력 후 자동으로 해제
+    if (isShiftActive) {
+      setIsShiftActive(false);
+    }
+  };
+
   return (
     <div className="w-full max-w-full px-2 lg:px-0">
       <div className="space-y-2 lg:space-y-2 mb-3 lg:mb-4">
@@ -27,11 +40,11 @@ export default function EnglishKeyboard({
           {['q','w','e','r','t','y','u','i','o','p'].map(letter => (
             <button
               key={letter}
-              onClick={() => onLetterClick(letter)}
+              onClick={() => handleLetterClick(letter)}
               disabled={showResult}
               className="bg-white hover:bg-gray-100 disabled:bg-gray-300 text-black font-bold py-3 px-1 lg:py-4 lg:px-4 rounded-lg text-base lg:text-2xl transition-colors flex-1 shadow-md border border-gray-200"
             >
-              {letter}
+              {isShiftActive ? letter.toUpperCase() : letter}
             </button>
           ))}
         </div>
@@ -42,11 +55,11 @@ export default function EnglishKeyboard({
           {['a','s','d','f','g','h','j','k','l'].map(letter => (
             <button
               key={letter}
-              onClick={() => onLetterClick(letter)}
+              onClick={() => handleLetterClick(letter)}
               disabled={showResult}
               className="bg-white hover:bg-gray-100 disabled:bg-gray-300 text-black font-bold py-3 px-1 lg:py-4 lg:px-4 rounded-lg text-base lg:text-2xl transition-colors flex-1 shadow-md border border-gray-200"
             >
-              {letter}
+              {isShiftActive ? letter.toUpperCase() : letter}
             </button>
           ))}
           {/* 작은따옴표 버튼 */}
@@ -60,17 +73,29 @@ export default function EnglishKeyboard({
           <div className="flex-1"></div>
         </div>
         
-        {/* 세 번째 줄 - 7개 + 백스페이스 */}
+        {/* 세 번째 줄 - Shift + 7개 + 백스페이스 */}
         <div className="flex gap-1 lg:gap-2">
-          <div className="flex-1"></div>
+          {/* Shift 버튼 */}
+          <button
+            onClick={() => setIsShiftActive(!isShiftActive)}
+            disabled={showResult}
+            className={`${
+              isShiftActive 
+                ? 'bg-blue-500 hover:bg-blue-600' 
+                : 'bg-gray-500 hover:bg-gray-600'
+            } disabled:bg-gray-300 text-white font-bold py-3 px-2 lg:py-4 lg:px-4 rounded-lg text-xs lg:text-base transition-colors shadow-md border border-gray-200`}
+            style={{ flex: '1.5' }}
+          >
+            Shift
+          </button>
           {['z','x','c','v','b','n','m'].map(letter => (
             <button
               key={letter}
-              onClick={() => onLetterClick(letter)}
+              onClick={() => handleLetterClick(letter)}
               disabled={showResult}
               className="bg-white hover:bg-gray-100 disabled:bg-gray-300 text-black font-bold py-3 px-1 lg:py-4 lg:px-4 rounded-lg text-base lg:text-2xl transition-colors flex-1 shadow-md border border-gray-200"
             >
-              {letter}
+              {isShiftActive ? letter.toUpperCase() : letter}
             </button>
           ))}
           
