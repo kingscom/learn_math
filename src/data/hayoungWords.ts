@@ -2,14 +2,18 @@ import { WordProblem } from '../types';
 
 // 하영이 영어 단어들
 export const hayoungWords: WordProblem[] = [
-  { korean: '아주 멋진', english: 'wonderful' },
-{ korean: '오랫동안', english: 'for a long time' },
-{ korean: '흥분시키다', english: 'excite' },
-{ korean: '아침', english: 'breakfast' },
-{ korean: '걸다', english: 'hang' },
-{ korean: '도착하다', english: 'arrive' },
-{ korean: '아름다운', english: 'beautiful' },
-{ korean: '과학', english: 'science' },
-{ korean: '잡고 있다', english: 'hold' },
-{ korean: '사진', english: 'picture' }
+  { korean: '특별한', english: 'special' },
+{ korean: '외로운', english: 'lonely' },
+{ korean: '어느 날', english: 'one day' },
+{ korean: '어떤 것', english: 'something' },
+{ korean: '떨어지다', english: 'drop' },
+{ korean: '바닥/층', english: 'floor' },
+{ korean: '체육관', english: 'gym' },
+{ korean: '저녁', english: 'supper' },
+{ korean: '부엌', english: 'kitchen' },
+{ korean: '불안해 하는', english: 'nervous' },
+{ korean: '지우개', english: 'eraser' },
+{ korean: '동물', english: 'animal' },
+{ korean: '재미있는', english: 'interesting' },
+{ korean: '잊다', english: 'forget' },
 ];
