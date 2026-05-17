@@ -8,7 +8,7 @@ import { koreanProverbs } from '../data/koreanProverbs';
 import { countries } from '../data/countries';
 import { historicalFigures } from '../data/historicalFigures';
 import { riddles } from '../data/riddles';
-import { generateMathProblems, getRandomItems, generateChoices, shuffleArray } from '../utils/gameUtils';
+import { generateMathProblems, generateHarangMathProblems, getRandomItems, generateChoices, shuffleArray } from '../utils/gameUtils';
 
 export const useGameLogic = () => {
   const [gameMode, setGameMode] = useState<GameMode>('menu');
@@ -150,6 +150,9 @@ export const useGameLogic = () => {
       const shuffled = shuffleArray(harangWords);
       setHarangProblems(shuffled);
       setHarangResults(new Array(shuffled.length).fill(false));
+    } else if (gameMode === 'harang-math') {
+      const newProblems = generateHarangMathProblems();
+      setProblems(newProblems);
     } else {
       const newProblems = generateMathProblems(gameMode as 'addition' | 'multiplication' | 'division');
       setProblems(newProblems);
@@ -158,7 +161,7 @@ export const useGameLogic = () => {
 
   // 타이머 useEffect (수수께끼, 하영이영어, 하랑이영어 제외한 모든 게임 모드에 적용)
   useEffect(() => {
-    if (gameMode !== 'menu' && gameMode !== 'riddle' && gameMode !== 'hayoung' && gameMode !== 'harang' && !showResult && !gameComplete) {
+    if (gameMode !== 'menu' && gameMode !== 'riddle' && gameMode !== 'hayoung' && gameMode !== 'harang' && gameMode !== 'harang-math' && !showResult && !gameComplete) {
       setTimeLeft(5);
       const timer = setInterval(() => {
         setTimeLeft(prev => {

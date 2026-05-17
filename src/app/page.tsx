@@ -49,7 +49,8 @@ export default function Home() {
 
   // 입력 핸들러들
   const handleNumberClick = (num: string) => {
-    if (userAnswer.length < 3) {
+    const maxLen = gameMode === 'harang-math' ? 4 : 3;
+    if (userAnswer.length < maxLen) {
       setUserAnswer(prev => prev + num);
     }
   };
@@ -194,8 +195,8 @@ export default function Home() {
             </div>
           </div>
 
-          {/* 타이머 (수수께끼, 하영이영어, 하랑이영어 제외) */}
-          {gameMode !== 'riddle' && gameMode !== 'hayoung' && gameMode !== 'harang' && (
+          {/* 타이머 (수수껸끄, 하영이영어, 하랑이영어, 하랑이수학 제외) */}
+          {gameMode !== 'riddle' && gameMode !== 'hayoung' && gameMode !== 'harang' && gameMode !== 'harang-math' && (
             <div className="flex-1">
               <div className="text-lg lg:text-xl font-bold text-red-600 mb-1 lg:mb-2">⏰ {timeLeft}초</div>
               <div className="w-full bg-gray-200 rounded-full h-2 lg:h-3">
@@ -386,6 +387,15 @@ export default function Home() {
                   🔊 발음 다시 듣기
                 </button>
               </div>
+            ) : gameMode === 'harang-math' ? (
+              <div className="text-center">
+                <div className="text-3xl lg:text-5xl font-bold text-gray-800 mb-4 lg:mb-6">
+                  🧮 하랑이 수학
+                </div>
+                <div className="text-4xl lg:text-6xl font-bold text-cyan-700 mb-4 lg:mb-6">
+                  {problems[currentProblem]?.num1} {problems[currentProblem]?.operation} {problems[currentProblem]?.num2} = ?
+                </div>
+              </div>
             ) : (
               <div className="text-center">
                 <div className="text-4xl lg:text-6xl font-bold text-gray-800 mb-4 lg:mb-6">
@@ -393,9 +403,8 @@ export default function Home() {
                 </div>
               </div>
             )}
-            
             {/* 답안 입력 표시 */}
-            {(gameMode === 'addition' || gameMode === 'multiplication' || gameMode === 'division' || gameMode === 'riddle' || (gameMode === 'hayoung' && !showResult) || gameMode === 'harang') ? (
+            {(gameMode === 'addition' || gameMode === 'multiplication' || gameMode === 'division' || gameMode === 'harang-math' || gameMode === 'riddle' || (gameMode === 'hayoung' && !showResult) || gameMode === 'harang') ? (
               <div className="text-2xl lg:text-4xl font-bold mb-4 lg:mb-6 min-h-12 lg:min-h-16 flex items-center border-2 border-gray-300 relative bg-white rounded-lg px-4 py-2 mx-auto max-w-xs lg:max-w-lg shadow-inner overflow-hidden">
                 <div className="flex items-center w-full">
                   {userAnswer ? (
@@ -532,6 +541,14 @@ export default function Home() {
                 onSpace={handleSpace}
                 onClear={handleClear}
                 onSubmit={handleHarangSubmit}
+                showResult={showResult}
+                userAnswer={userAnswer}
+              />
+            ) : gameMode === 'harang-math' ? (
+              <NumberKeypad
+                onNumberClick={handleNumberClick}
+                onClear={handleClear}
+                onSubmit={handleSubmit}
                 showResult={showResult}
                 userAnswer={userAnswer}
               />

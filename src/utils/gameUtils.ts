@@ -39,6 +39,27 @@ export const generateMathProblems = (gameMode: 'addition' | 'multiplication' | '
   return problems;
 };
 
+// 하랑이 수학 - 3자리수 덧셈/뺄셈 문제 생성
+export const generateHarangMathProblems = (): Problem[] => {
+  const problems: Problem[] = [];
+
+  for (let i = 0; i < 10; i++) {
+    const isAddition = Math.random() > 0.5;
+    if (isAddition) {
+      const num1 = Math.floor(Math.random() * 900) + 100; // 100-999
+      const num2 = Math.floor(Math.random() * 900) + 100; // 100-999
+      problems.push({ num1, num2, answer: num1 + num2, operation: '+' });
+    } else {
+      // 뺄셈: num1 >= 200, num2 는 100 ~ num1-1 범위 (둘 다 3자리)
+      const num1 = Math.floor(Math.random() * 800) + 200; // 200-999
+      const num2 = Math.floor(Math.random() * (num1 - 100)) + 100; // 100 ~ num1-1
+      problems.push({ num1, num2, answer: num1 - num2, operation: '-' });
+    }
+  }
+
+  return problems;
+};
+
 // 배열 셔플 함수
 export const shuffleArray = <T>(array: T[]): T[] => {
   const shuffled = [...array];

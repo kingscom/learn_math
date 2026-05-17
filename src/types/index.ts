@@ -2,6 +2,7 @@ export interface Problem {
   num1: number;
   num2: number;
   answer: number;
+  operation?: '+' | '-' | '×' | '÷';
 }
 
 export interface WordProblem {
@@ -36,4 +37,4 @@ export interface RiddleProblem {
   hint?: string;
 }
 
-export type GameMode = 'menu' | 'addition' | 'multiplication' | 'division' | 'english' | 'english2' | 'proverb' | 'country' | 'historical' | 'riddle' | 'hayoung' | 'harang';
+export type GameMode = 'menu' | 'addition' | 'multiplication' | 'division' | 'english' | 'english2' | 'proverb' | 'country' | 'historical' | 'riddle' | 'hayoung' | 'harang' | 'harang-math';
